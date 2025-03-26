@@ -1,0 +1,6 @@
+@TCUApi_HostAddress = http://localhost:5236
+
+GET {{TCUApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
