@@ -7,5 +7,7 @@ namespace TCUApi.Servicios
         long ObtenerUsuarioFromToken(IEnumerable<Claim> claims);
         string ObtenerRolFromToken(IEnumerable<Claim> claims);
         bool EsAdministrador(IEnumerable<Claim> claims);
+
+        string Encrypt(string texto);
     }
 }

@@ -8,5 +8,7 @@
         public string? Ruta { get; set; }
         public IFormFile? File { get; set; }
         public string? FechaSubida { get; set; }
+        public long Id_Familia { get; set; }
+        public string? NombreRepresentante { get; set; }
     }
 }

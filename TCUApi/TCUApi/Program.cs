@@ -7,12 +7,28 @@ using TCUApi.Servicios;
 //using TCPUapi.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: "MyPolicy",
+        policy =>
+        {
+            policy.WithOrigins("http://localhost:5173")
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        });
+});
+
+
+
+
 
 // Add services to the container.
 
 builder.Services.AddControllers().AddJsonOptions(x => x.JsonSerializerOptions.PropertyNamingPolicy = null);
 
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddHttpClient();
+
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IGeneral, General>();
 
@@ -68,8 +84,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseCors("MyPolicy");
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();

@@ -1,6 +1,6 @@
 USE [master]
 GO
-/****** Object:  Database [AbrazosDB]    Script Date: 26/03/2025 04:20:07 p. m. ******/
+/****** Object:  Database [AbrazosDB]    Script Date: 15/04/2025 05:54:52 a. m. ******/
 CREATE DATABASE [AbrazosDB]
  CONTAINMENT = NONE
  ON  PRIMARY 
@@ -84,7 +84,24 @@ ALTER DATABASE [AbrazosDB] SET QUERY_STORE (OPERATION_MODE = READ_WRITE, CLEANUP
 GO
 USE [AbrazosDB]
 GO
-/****** Object:  Table [dbo].[categoria]    Script Date: 26/03/2025 04:20:07 p. m. ******/
+/****** Object:  Table [dbo].[ArchivosUser]    Script Date: 15/04/2025 05:54:53 a. m. ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[ArchivosUser](
+	[Id_ArchivoUser] [bigint] IDENTITY(1,1) NOT NULL,
+	[Nombre] [varchar](100) NOT NULL,
+	[Tipo] [varchar](255) NOT NULL,
+	[Ruta] [varchar](500) NOT NULL,
+	[FechaSubida] [datetime] NOT NULL,
+ CONSTRAINT [PK_ArchivosUser] PRIMARY KEY CLUSTERED 
+(
+	[Id_ArchivoUser] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[categoria]    Script Date: 15/04/2025 05:54:53 a. m. ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -99,7 +116,38 @@ PRIMARY KEY CLUSTERED
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[Expedientes]    Script Date: 26/03/2025 04:20:07 p. m. ******/
+/****** Object:  Table [dbo].[EsperaUsuarios]    Script Date: 15/04/2025 05:54:53 a. m. ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[EsperaUsuarios](
+	[Id_Espera] [bigint] IDENTITY(1,1) NOT NULL,
+	[Id_Usuario] [bigint] NOT NULL,
+	[Fecha_Solicitud] [datetime] NOT NULL,
+	[Id_Estado] [bigint] NOT NULL,
+	[Observacion] [text] NOT NULL,
+ CONSTRAINT [PK_EsperaUsuarios] PRIMARY KEY CLUSTERED 
+(
+	[Id_Espera] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[EstadoRegistro]    Script Date: 15/04/2025 05:54:53 a. m. ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[EstadoRegistro](
+	[Id_EstadoRegistro] [bigint] IDENTITY(1,1) NOT NULL,
+	[Nombre] [varchar](100) NOT NULL,
+ CONSTRAINT [PK_EstadoRegistro] PRIMARY KEY CLUSTERED 
+(
+	[Id_EstadoRegistro] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[Expedientes]    Script Date: 15/04/2025 05:54:53 a. m. ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -110,33 +158,35 @@ CREATE TABLE [dbo].[Expedientes](
 	[Tipo] [varchar](255) NOT NULL,
 	[Ruta] [varchar](500) NOT NULL,
 	[FechaSubida] [datetime] NOT NULL,
+	[Id_Familia] [bigint] NOT NULL,
  CONSTRAINT [PK_Expedientes] PRIMARY KEY CLUSTERED 
 (
 	[Id_Archivo] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[familias]    Script Date: 26/03/2025 04:20:07 p. m. ******/
+/****** Object:  Table [dbo].[familias]    Script Date: 15/04/2025 05:54:53 a. m. ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
 CREATE TABLE [dbo].[familias](
-	[id_familia] [int] IDENTITY(1,1) NOT NULL,
+	[id_familia] [bigint] IDENTITY(1,1) NOT NULL,
 	[nombre_representante] [nvarchar](100) NOT NULL,
 	[direccion] [nvarchar](255) NOT NULL,
-	[telefono] [char](8) NOT NULL,
+	[telefono] [varchar](8) NOT NULL,
 	[cantidad_familiares] [int] NOT NULL,
 	[cantidad_ninos] [int] NOT NULL,
-	[id_vulnerabilidad] [int] NULL,
-	[presupuesto] [float] NULL,
-PRIMARY KEY CLUSTERED 
+	[id_vulnerabilidad] [int] NOT NULL,
+	[presupuesto] [decimal](10, 2) NULL,
+	[cedula_representante] [varchar](100) NOT NULL,
+ CONSTRAINT [PK__familias__609C48522D019818] PRIMARY KEY CLUSTERED 
 (
 	[id_familia] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[inventario]    Script Date: 26/03/2025 04:20:07 p. m. ******/
+/****** Object:  Table [dbo].[inventario]    Script Date: 15/04/2025 05:54:53 a. m. ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -152,23 +202,23 @@ PRIMARY KEY CLUSTERED
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[presupuestos]    Script Date: 26/03/2025 04:20:07 p. m. ******/
+/****** Object:  Table [dbo].[presupuestos]    Script Date: 15/04/2025 05:54:53 a. m. ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
 CREATE TABLE [dbo].[presupuestos](
 	[id_presupuesto] [int] IDENTITY(1,1) NOT NULL,
-	[id_familia] [int] NOT NULL,
+	[id_familia] [bigint] NOT NULL,
 	[monto_total] [decimal](10, 2) NOT NULL,
 	[descripcion] [nvarchar](max) NOT NULL,
-PRIMARY KEY CLUSTERED 
+ CONSTRAINT [PK__presupue__3E94B4E548F609DD] PRIMARY KEY CLUSTERED 
 (
 	[id_presupuesto] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[rol]    Script Date: 26/03/2025 04:20:07 p. m. ******/
+/****** Object:  Table [dbo].[rol]    Script Date: 15/04/2025 05:54:53 a. m. ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -182,13 +232,14 @@ PRIMARY KEY CLUSTERED
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[usuarios]    Script Date: 26/03/2025 04:20:07 p. m. ******/
+/****** Object:  Table [dbo].[usuarios]    Script Date: 15/04/2025 05:54:53 a. m. ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
 CREATE TABLE [dbo].[usuarios](
 	[id_usuario] [bigint] IDENTITY(1,1) NOT NULL,
+	[Cedula] [varchar](50) NOT NULL,
 	[nombre] [nvarchar](100) NOT NULL,
 	[apellidos] [nvarchar](100) NOT NULL,
 	[correo] [nvarchar](100) NOT NULL,
@@ -198,13 +249,15 @@ CREATE TABLE [dbo].[usuarios](
 	[fecha_registro] [date] NOT NULL,
 	[password_temp_status] [bit] NULL,
 	[password_temp_expiration] [datetime] NULL,
+	[Id_ArchivosUser] [bigint] NULL,
+	[Id_EstadoRegistro] [bigint] NULL,
  CONSTRAINT [PK__usuarios__4E3E04AD0492928B] PRIMARY KEY CLUSTERED 
 (
 	[id_usuario] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[voluntarios]    Script Date: 26/03/2025 04:20:07 p. m. ******/
+/****** Object:  Table [dbo].[voluntarios]    Script Date: 15/04/2025 05:54:53 a. m. ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -220,7 +273,7 @@ CREATE TABLE [dbo].[voluntarios](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[vulnerabilidad]    Script Date: 26/03/2025 04:20:07 p. m. ******/
+/****** Object:  Table [dbo].[vulnerabilidad]    Script Date: 15/04/2025 05:54:53 a. m. ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -234,29 +287,10 @@ PRIMARY KEY CLUSTERED
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-SET IDENTITY_INSERT [dbo].[Expedientes] ON 
+ALTER TABLE [dbo].[EsperaUsuarios]  WITH CHECK ADD  CONSTRAINT [FK_EsperaUsuarios_EsperaUsuarios] FOREIGN KEY([Id_Espera])
+REFERENCES [dbo].[EsperaUsuarios] ([Id_Espera])
 GO
-INSERT [dbo].[Expedientes] ([Id_Archivo], [Nombre], [Tipo], [Ruta], [FechaSubida]) VALUES (1, N'TCU req.docx', N'application/vnd.openxmlformats-officedocument.wordprocessingml.document', N'D:\Ufidelitas\TCU\TCUApi\TCUApi\ArchivosSubidos\TCU req.docx', CAST(N'2025-03-26T12:45:48.760' AS DateTime))
-GO
-INSERT [dbo].[Expedientes] ([Id_Archivo], [Nombre], [Tipo], [Ruta], [FechaSubida]) VALUES (3, N'SebastianCoto_SC707_V_Portafolio1.pdf', N'application/pdf', N'iMrstGkUck5z09C48YoPhm/N+skRXMNzEU3VRzJykCrio41+N6ElJdAuJx3Xmx04f3ErP8zY6k81Pje8S2R5ByYLjdZg2ethfK7CkciGABoMseYzXJI8pgEK2qzf48d8', CAST(N'2025-03-26T13:24:48.923' AS DateTime))
-GO
-SET IDENTITY_INSERT [dbo].[Expedientes] OFF
-GO
-SET IDENTITY_INSERT [dbo].[rol] ON 
-GO
-INSERT [dbo].[rol] ([id_rol], [nombre]) VALUES (1, N'Administrador')
-GO
-INSERT [dbo].[rol] ([id_rol], [nombre]) VALUES (2, N'Voluntario')
-GO
-SET IDENTITY_INSERT [dbo].[rol] OFF
-GO
-SET IDENTITY_INSERT [dbo].[usuarios] ON 
-GO
-INSERT [dbo].[usuarios] ([id_usuario], [nombre], [apellidos], [correo], [username], [password], [id_rol], [fecha_registro], [password_temp_status], [password_temp_expiration]) VALUES (1, N'Sebastian', N'Coto Gonzalez', N'secogonzalez2005@gmail.com', N'SebasCoto', N'123', 1, CAST(N'2025-02-24' AS Date), 0, NULL)
-GO
-INSERT [dbo].[usuarios] ([id_usuario], [nombre], [apellidos], [correo], [username], [password], [id_rol], [fecha_registro], [password_temp_status], [password_temp_expiration]) VALUES (4, N'Laura', N'Gonzalez', N'lgc2811@gmail.com', N'lgonzalez', N'JK75RNPA9J', 2, CAST(N'2025-03-26' AS Date), 0, NULL)
-GO
-SET IDENTITY_INSERT [dbo].[usuarios] OFF
+ALTER TABLE [dbo].[EsperaUsuarios] CHECK CONSTRAINT [FK_EsperaUsuarios_EsperaUsuarios]
 GO
 ALTER TABLE [dbo].[familias]  WITH CHECK ADD  CONSTRAINT [FK_FAMILIAS_VULNERABILIDAD] FOREIGN KEY([id_vulnerabilidad])
 REFERENCES [dbo].[vulnerabilidad] ([id_vulnerabilidad])
@@ -273,17 +307,90 @@ REFERENCES [dbo].[familias] ([id_familia])
 GO
 ALTER TABLE [dbo].[presupuestos] CHECK CONSTRAINT [FK_PRESUPUESTOS_FAMILIAS]
 GO
-ALTER TABLE [dbo].[usuarios]  WITH CHECK ADD  CONSTRAINT [FK_USUARIOS_ROL] FOREIGN KEY([id_rol])
-REFERENCES [dbo].[rol] ([id_rol])
+ALTER TABLE [dbo].[usuarios]  WITH CHECK ADD  CONSTRAINT [FK_usuarios_EstadoRegistro] FOREIGN KEY([Id_EstadoRegistro])
+REFERENCES [dbo].[EstadoRegistro] ([Id_EstadoRegistro])
 GO
-ALTER TABLE [dbo].[usuarios] CHECK CONSTRAINT [FK_USUARIOS_ROL]
+ALTER TABLE [dbo].[usuarios] CHECK CONSTRAINT [FK_usuarios_EstadoRegistro]
 GO
 ALTER TABLE [dbo].[voluntarios]  WITH CHECK ADD  CONSTRAINT [FK_VOLUNTARIOS_USUARIOS] FOREIGN KEY([id_usuario])
 REFERENCES [dbo].[usuarios] ([id_usuario])
 GO
 ALTER TABLE [dbo].[voluntarios] CHECK CONSTRAINT [FK_VOLUNTARIOS_USUARIOS]
 GO
-/****** Object:  StoredProcedure [dbo].[ActualizarUsuario]    Script Date: 26/03/2025 04:20:07 p. m. ******/
+/****** Object:  StoredProcedure [dbo].[ActualizarContrasenna]    Script Date: 15/04/2025 05:54:53 a. m. ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+CREATE PROCEDURE [dbo].[ActualizarContrasenna]
+	@Id_usuario bigint,
+	@Password nvarchar(100),
+	@OldPassword nvarchar(100),
+	@ConfirmPassword nvarchar(100) 
+AS
+BEGIN
+	
+	IF(@OldPassword != '')
+	BEGIN
+		UPDATE usuarios
+		SET password = @Password
+		WHERE	id_usuario = @Id_usuario
+			AND password = @OldPassword
+	END
+	ELSE
+	BEGIN
+		UPDATE usuarios
+		SET password = @Password
+		WHERE id_usuario = @Id_usuario
+	END
+
+END
+GO
+/****** Object:  StoredProcedure [dbo].[ActualizarFamilia]    Script Date: 15/04/2025 05:54:53 a. m. ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[ActualizarFamilia]
+    @Id_Familia bigint,
+    @Nombre_Representante nvarchar(100),
+    @Cedula_Representante varchar(100),
+    @Direccion nvarchar(255),
+    @Telefono varchar(8),
+    @Cantidad_Familiares int,
+    @Cantidad_Ninos int,
+    @Id_Vulnerabilidad int
+AS
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM dbo.familias 
+                   WHERE id_familia = @Id_Familia)
+    BEGIN
+        RAISERROR('No se encuentra la familia.', 16, 1);
+    END
+    ELSE
+    BEGIN
+        UPDATE dbo.familias
+        SET nombre_representante = @Nombre_Representante,
+            cedula_representante = @Cedula_Representante,
+            direccion = @Direccion,
+            telefono = @Telefono,
+            cantidad_familiares = @Cantidad_Familiares,
+            cantidad_ninos = @Cantidad_Ninos,
+            id_vulnerabilidad = @Id_Vulnerabilidad
+        WHERE id_familia = @Id_Familia;
+
+        DECLARE @SUMA_PRESUPUESTO FLOAT;
+        SELECT @SUMA_PRESUPUESTO = SUM(presupuesto) 
+        FROM dbo.familias;
+
+        PRINT @SUMA_PRESUPUESTO;
+        EXEC [dbo].[CalcularPresupuesto] @MONTO_TOTAL = @SUMA_PRESUPUESTO;
+    END
+END
+GO
+/****** Object:  StoredProcedure [dbo].[ActualizarUsuario]    Script Date: 15/04/2025 05:54:53 a. m. ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -313,7 +420,55 @@ BEGIN
 
 END
 GO
-/****** Object:  StoredProcedure [dbo].[DescargarArchivo]    Script Date: 26/03/2025 04:20:07 p. m. ******/
+/****** Object:  StoredProcedure [dbo].[CalcularPresupuesto]    Script Date: 15/04/2025 05:54:53 a. m. ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[CalcularPresupuesto] 
+    @MONTO_TOTAL MONEY  
+AS
+BEGIN
+    DECLARE @SUMA_FACTORES FLOAT;
+    
+    IF OBJECT_ID('tempdb..#FamiliasTemp') IS NOT NULL
+        DROP TABLE #FamiliasTemp;
+
+    CREATE TABLE #FamiliasTemp (
+        ID_FAMILIA INT,
+        FACTOR FLOAT,
+        PRESUPUESTO MONEY
+    );
+
+    INSERT INTO #FamiliasTemp (ID_FAMILIA, FACTOR)
+    SELECT 
+        ID_FAMILIA,
+        (1.0 * cantidad_familiares) + (2.0 * CANTIDAD_NINOS) + 
+        CASE id_vulnerabilidad 
+            WHEN 1 THEN 3.0
+            WHEN 2 THEN 2.0
+            WHEN 3 THEN 1.0
+            ELSE 1.0
+        END
+    FROM Familias;
+
+    SELECT @SUMA_FACTORES = SUM(FACTOR) FROM #FamiliasTemp;
+
+    IF @SUMA_FACTORES = 0
+    BEGIN
+        PRINT 'No hay familias registradas o no tienen factores válidos.';
+        RETURN;
+    END
+
+    UPDATE F
+    SET F.PRESUPUESTO = (@MONTO_TOTAL * T.FACTOR) / @SUMA_FACTORES
+    FROM Familias F
+    INNER JOIN #FamiliasTemp T ON F.ID_FAMILIA = T.ID_FAMILIA;
+
+    PRINT 'Presupuesto calculado y actualizado proporcionalmente.';
+END;
+GO
+/****** Object:  StoredProcedure [dbo].[DescargarArchivo]    Script Date: 15/04/2025 05:54:53 a. m. ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -331,7 +486,23 @@ BEGIN
 	WHERE Id_Archivo = @Id_Archivo
 END
 GO
-/****** Object:  StoredProcedure [dbo].[EliminarUsuario]    Script Date: 26/03/2025 04:20:07 p. m. ******/
+/****** Object:  StoredProcedure [dbo].[EliminarFamilia]    Script Date: 15/04/2025 05:54:53 a. m. ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE PROCEDURE [dbo].[EliminarFamilia]
+	@Id_Familia bigint
+AS
+BEGIN
+	
+	DELETE FROM familias
+	WHERE id_familia = @Id_Familia
+
+END
+GO
+/****** Object:  StoredProcedure [dbo].[EliminarUsuario]    Script Date: 15/04/2025 05:54:53 a. m. ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -347,7 +518,7 @@ BEGIN
 
 END
 GO
-/****** Object:  StoredProcedure [dbo].[IniciarSesion]    Script Date: 26/03/2025 04:20:07 p. m. ******/
+/****** Object:  StoredProcedure [dbo].[IniciarSesion]    Script Date: 15/04/2025 05:54:53 a. m. ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -364,6 +535,7 @@ BEGIN
 			apellidos,
 			r.nombre as 'NombreRol',
 			Correo,
+			Id_EstadoRegistro,
 			username
 	FROM	dbo.usuarios U
 	JOIN dbo.rol r  ON U.id_rol = r.id_rol
@@ -372,7 +544,94 @@ BEGIN
 
 END
 GO
-/****** Object:  StoredProcedure [dbo].[RegistrarArchivo]    Script Date: 26/03/2025 04:20:07 p. m. ******/
+/****** Object:  StoredProcedure [dbo].[ObtenerExpedientes]    Script Date: 15/04/2025 05:54:53 a. m. ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE PROCEDURE [dbo].[ObtenerExpedientes]
+ @Id_Expediente BIGINT
+AS
+BEGIN
+	IF NOT EXISTS(SELECT 1 FROM dbo.Expedientes 
+              WHERE Id_Archivo = @Id_Expediente)
+    BEGIN
+        RAISERROR('Expediente no encontrado.', 16, 1);
+    END
+	ELSE
+	BEGIN
+		IF(@Id_Expediente = 0)
+			SET @Id_Expediente = NULL
+	
+		SELECT	E.Id_Archivo,
+				E.Nombre,
+				E.FechaSubida,
+				E.Id_Familia,
+				F.nombre_representante 'NombreRepresentante'
+		FROM	dbo.Expedientes E
+		INNER	JOIN dbo.familias F ON E.Id_Familia = F.id_familia
+		WHERE  Id_Archivo= ISNULL(@Id_Expediente,Id_Archivo)
+	END
+END
+GO
+/****** Object:  StoredProcedure [dbo].[ObtenerFamilias]    Script Date: 15/04/2025 05:54:53 a. m. ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE PROCEDURE [dbo].[ObtenerFamilias]
+ @Id_Familia BIGINT
+AS
+BEGIN
+
+	IF(@Id_Familia = 0)
+		SET @Id_Familia = NULL
+	
+	SELECT	F.id_familia,
+			F.nombre_representante,
+			F.cedula_representante,
+			F.direccion,
+			F.telefono,
+			F.cantidad_familiares,
+			F.cantidad_ninos,
+			F.presupuesto,
+			V.nombre 'Nombre_Vulnerabilidad'
+	FROM	dbo.familias F
+	INNER	JOIN dbo.vulnerabilidad V ON F.id_vulnerabilidad = V.id_vulnerabilidad
+	WHERE  id_familia= ISNULL(@Id_Familia,id_familia)
+
+END
+GO
+/****** Object:  StoredProcedure [dbo].[ObtenerUsuarios]    Script Date: 15/04/2025 05:54:53 a. m. ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE PROCEDURE [dbo].[ObtenerUsuarios]
+ @Id_usuario BIGINT
+AS
+BEGIN
+
+	IF(@Id_usuario = 0)
+		SET @Id_usuario = NULL
+	
+	SELECT	U.id_usuario,
+			U.Nombre 'NombreUsuario',
+			U.apellidos,
+			U.username,
+			Correo,
+			U.id_rol,
+			R.nombre 'NombreRol'
+	FROM	dbo.usuarios U
+	INNER	JOIN dbo.rol R ON U.id_rol = R.id_rol
+	WHERE  id_usuario= ISNULL(@Id_usuario,id_usuario)
+
+END
+GO
+/****** Object:  StoredProcedure [dbo].[RegistrarArchivo]    Script Date: 15/04/2025 05:54:53 a. m. ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -381,16 +640,58 @@ GO
 CREATE PROCEDURE [dbo].[RegistrarArchivo]
 	 @Nombre NVARCHAR(255),
     @Tipo NVARCHAR(100),
-    @Ruta NVARCHAR(500)
+    @Ruta NVARCHAR(500),
+	@Id_Familia bigint
 AS
 BEGIN
 	
-	INSERT INTO dbo.Expedientes (Nombre, Tipo, Ruta, FechaSubida)
-    VALUES (@Nombre, @Tipo, @Ruta,GETDATE());
+	 IF NOT EXISTS(SELECT 1 FROM dbo.familias 
+              WHERE id_familia = @Id_Familia)
+    BEGIN
+        RAISERROR('Familia no encontrada.', 16, 1);
+    END
+    ELSE
+    BEGIN
+       INSERT INTO dbo.Expedientes (Nombre, Tipo, Ruta, FechaSubida,Id_Familia)
+		VALUES (@Nombre, @Tipo, @Ruta,GETDATE(),@Id_Familia);
+    END
+
+	
 
 END
 GO
-/****** Object:  StoredProcedure [dbo].[RegistrarUsuario]    Script Date: 26/03/2025 04:20:07 p. m. ******/
+/****** Object:  StoredProcedure [dbo].[RegistrarFamilia]    Script Date: 15/04/2025 05:54:53 a. m. ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE PROCEDURE [dbo].[RegistrarFamilia]
+    @Nombre_Representante nvarchar(100),
+    @Cedula_Representante varchar(100),
+    @Direccion nvarchar(255),
+    @Telefono varchar(8),
+    @Cantidad_Familiares int,
+	@Cantidad_Ninos int,
+	@Id_Vulnerabilidad int
+AS
+BEGIN
+
+    IF EXISTS(SELECT 1 FROM dbo.familias 
+              WHERE nombre_representante = @Nombre_Representante
+                 OR cedula_representante = @Cedula_Representante)
+    BEGIN
+        RAISERROR('El nombre del representante ya tiene una familia registrada.', 16, 1);
+    END
+    ELSE
+    BEGIN
+        INSERT INTO dbo.familias(nombre_representante, cedula_representante, direccion, telefono, cantidad_familiares, cantidad_ninos, id_vulnerabilidad)
+        VALUES (@Nombre_Representante, @Cedula_Representante, @Direccion, @Telefono, @Cantidad_Familiares, @Cantidad_Ninos, @Id_Vulnerabilidad)
+    END
+
+END
+GO
+/****** Object:  StoredProcedure [dbo].[RegistrarUsuario]    Script Date: 15/04/2025 05:54:53 a. m. ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -398,11 +699,11 @@ GO
 
 CREATE PROCEDURE [dbo].[RegistrarUsuario]
     @NombreUsuario nvarchar(100),
+	@Cedula varchar(50) ,
     @Apellidos nvarchar(100),
     @Correo nvarchar(100),
     @Username nvarchar(100),
-    @Password nvarchar(100),
-    @Id_Rol int
+    @Password nvarchar(100)
 AS
 BEGIN
 
@@ -414,9 +715,32 @@ BEGIN
     END
     ELSE
     BEGIN
-        INSERT INTO dbo.usuarios(nombre, apellidos, Correo, username, password, id_rol, fecha_registro, password_temp_status, password_temp_expiration)
-        VALUES (@NombreUsuario, @Apellidos, @Correo, @Username, @Password, @Id_Rol, GETDATE(), 0, NULL)
+        INSERT INTO dbo.usuarios(nombre,cedula,apellidos, Correo, username, password, id_rol, fecha_registro, password_temp_status, password_temp_expiration,Id_EstadoRegistro)
+        VALUES (@NombreUsuario,@Cedula, @Apellidos, @Correo, @Username, @Password, 2, GETDATE(), 0, NULL,3)
     END
+
+END
+GO
+/****** Object:  StoredProcedure [dbo].[VerificarCorreo]    Script Date: 15/04/2025 05:54:53 a. m. ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE PROCEDURE [dbo].[VerificarCorreo]
+	@Correo nvarchar(100)
+AS
+BEGIN
+	
+	SELECT	U.id_usuario,
+			U.Nombre 'NombreUsuario',
+			apellidos,
+			r.nombre as 'NombreRol',
+			Correo,
+			username
+	FROM	dbo.usuarios U
+	JOIN dbo.rol r  ON U.id_rol = r.id_rol
+	WHERE   correo = @Correo
 
 END
 GO

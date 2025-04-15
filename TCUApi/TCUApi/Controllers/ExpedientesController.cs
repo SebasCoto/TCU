@@ -3,9 +3,11 @@ using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
+using System.Data;
 using System.Security.Cryptography;
 using System.Text;
 using TCUApi.Model;
+using TCUApi.Servicios;
 
 namespace TCUApi.Controllers
 {
@@ -13,17 +15,24 @@ namespace TCUApi.Controllers
     [ApiController]
     public class ExpedientesController : ControllerBase
     {
-        private readonly IConfiguration _configuration;
 
-        public ExpedientesController(IConfiguration configuration)
+        private readonly IConfiguration _configuration;
+        private readonly IGeneral _general;
+
+        public ExpedientesController(IConfiguration configuration,IGeneral general)
         {
             _configuration = configuration;
+            _general = general;
         }
 
         [HttpPost]
-        [Route("RegistrarArchivo")]
-        public IActionResult RegistrarArchivo(/*[FromForm]*/ IFormFile archivo)
+        [Route("RegistrarArchivo/{Id_Familia}")]
+        public IActionResult RegistrarArchivo(/*[FromForm]*/ IFormFile archivo, long Id_Familia)
         {
+            if (!_general.EsAdministrador(User.Claims))
+            {
+                return Unauthorized(new { mensaje = "No tiene permisos para realizar esta acción" });
+            }
             try
             {
                 if (archivo == null || archivo.Length == 0)
@@ -54,14 +63,14 @@ namespace TCUApi.Controllers
                     Ruta = rutaEncriptada
                 };
 
-                // Registrar el archivo en la base de datos
                 using (var connection = new SqlConnection(_configuration.GetSection("ConnectionStrings:AbrazosDBConnection").Value))
                 {
                     var result = connection.Execute("RegistrarArchivo", new
                     {
                         nuevoArchivo.Nombre,
                         nuevoArchivo.Tipo,
-                        nuevoArchivo.Ruta
+                        nuevoArchivo.Ruta,
+                        Id_Familia
                     });
 
                     var respuesta = new RespuestaModel();
@@ -89,6 +98,10 @@ namespace TCUApi.Controllers
         [Route("DescargarArchivo/{id}")]
         public IActionResult DescargarArchivo(int id)
         {
+            if (!_general.EsAdministrador(User.Claims))
+            {
+                return Unauthorized(new { mensaje = "No tiene permisos para realizar esta acción" });
+            }
             using (var connection = new SqlConnection(_configuration.GetSection("ConnectionStrings:AbrazosDBConnection").Value))
             {
                 var archivo = connection.QueryFirstOrDefault<dynamic>("DescargarArchivo", new { Id_Archivo = id });
@@ -104,7 +117,34 @@ namespace TCUApi.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("ObtenerExpedientes")]
+        public IActionResult ObtenerExpedientes(long Id_Expediente)
+        {
+            try
+            {
 
+                if (!_general.EsAdministrador(User.Claims))
+                {
+                    return Unauthorized(new { mensaje = "No tiene permisos para realizar esta acción" });
+                }
+                using (var connection = new SqlConnection(_configuration.GetConnectionString("AbrazosDBConnection")))
+                {
+                    var result = connection.Query<ExpedientesModel>("ObtenerExpedientes", new { Id_Expediente }, commandType: CommandType.StoredProcedure).ToList();
+                    return Ok(new RespuestaModel { Indicador = true, Datos = result });
+                }
+            }
+            catch (SqlException sqlEx)
+            {
+                return StatusCode(500, new { error = "Error en la base de datos", detalle = sqlEx.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = "Error en el servidor", detalle = ex.Message });
+            }
+
+
+        }
 
 
 

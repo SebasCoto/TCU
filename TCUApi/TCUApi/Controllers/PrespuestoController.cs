@@ -1,0 +1,68 @@
+﻿using Dapper;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
+using System.Data;
+using TCUApi.Model;
+using TCUApi.Servicios;
+
+namespace TCUApi.Controllers
+{
+    [Authorize]
+    [Route("api/[controller]")]
+    [ApiController]
+    public class PrespuestoController : ControllerBase
+    {
+        private readonly IConfiguration _configuration;
+        private readonly IGeneral _general;
+        private readonly IHttpClientFactory _httpClientFactory;
+
+        public PrespuestoController(IConfiguration configuration, IGeneral general, IHttpClientFactory httpClient)
+        {
+            _configuration = configuration;
+            _general = general;
+            _httpClientFactory = httpClient;
+        }
+
+        #region prespuesto
+
+        [HttpPost]
+        [Route("RegistrarPresupuesto")]
+        public IActionResult RegistrarPresupuesto(FamiliasModel model, decimal MontoTotal)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new { error = "Datos del modelo no válidos", detalle = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList() });
+            }
+
+            try
+            {
+                if (!_general.EsAdministrador(User.Claims))
+                {
+                    return Unauthorized(new { mensaje = "No tiene permisos para realizar esta acción" });
+                }
+
+                using (var connection = new SqlConnection(_configuration.GetConnectionString("AbrazosDBConnection")))
+                {
+                    var result = connection.Execute("CalcularPresupuesto", new { MONTO_TOTAL = MontoTotal }, commandType: CommandType.StoredProcedure);
+                    return Ok(new RespuestaModel { Indicador = true, Mensaje = "Presupuesto registrado correctamente" });
+                }
+            }
+            catch (SqlException sqlEx)
+            {
+                return StatusCode(500, new { error = "Error en la base de datos", detalle = sqlEx.Message, codigo = sqlEx.Number });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = "Error en el servidor", detalle = ex.Message });
+            }
+        }
+
+
+
+
+
+        #endregion
+    }
+}
