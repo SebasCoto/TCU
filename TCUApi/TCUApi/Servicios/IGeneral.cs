@@ -8,6 +8,7 @@ namespace TCUApi.Servicios
         string ObtenerRolFromToken(IEnumerable<Claim> claims);
         bool EsAdministrador(IEnumerable<Claim> claims);
 
+        void EnviarCorreo(string destino, string asunto, string contenido);
         string Encrypt(string texto);
     }
 }

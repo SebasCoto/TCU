@@ -1,7 +1,24 @@
 <template>
-  <router-view></router-view>
+  <component :is="layout">
+    <router-view />
+  </component>
 </template>
 
-<script></script>
+<script lang="ts">
+import { defineComponent, computed } from 'vue'
+import { useRouter } from 'vue-router'
 
-<style></style>
+const defaultLayout = 'default'
+
+export default defineComponent({
+  setup() {
+    const { currentRoute } = useRouter()
+
+    const layout = computed(() => `${currentRoute.value.meta.layout || defaultLayout}-layout`)
+
+    return {
+      layout,
+    }
+  },
+})
+</script>

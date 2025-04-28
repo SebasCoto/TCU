@@ -3,9 +3,9 @@ const homeRoutes = [
     path: '/home',
     name: 'home',
     component: () => import('@/views/Home.vue'),
-    /**meta: {
+    meta: {
       requiresAuth: true,
-    },**/
+    },
   },
 ]
 

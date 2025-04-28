@@ -4,8 +4,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 using System.Data;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net.Http;
 using System.Net.Mail;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -23,10 +25,12 @@ namespace TCUApi.Controllers
     {
         private readonly IConfiguration _configuration;
         private readonly IGeneral _general;
-        public LoginController(IConfiguration configuration,IGeneral general)
+        private readonly IHttpClientFactory _httpClientFactory;
+        public LoginController(IConfiguration configuration, IGeneral general, IHttpClientFactory httpClientFactory)
         {
             _configuration = configuration;
             _general = general;
+            _httpClientFactory = httpClientFactory;
         }
 
         #region iniciarSesion
@@ -36,8 +40,10 @@ namespace TCUApi.Controllers
         {
             using (var context = new SqlConnection(_configuration.GetSection("ConnectionStrings:AbrazosDBConnection").Value))
             {
+
+                var contraEncriptada = Encrypt(model.Password!);
                 var result = context.QueryFirstOrDefault<UsuarioModel>("IniciarSesion",
-                    new { model.Username, model.Password }, commandType: CommandType.StoredProcedure);
+                    new { NombreUsuario =model.Username, password = contraEncriptada }, commandType: CommandType.StoredProcedure);
 
                 var respuesta = new RespuestaModel();
 
@@ -55,7 +61,7 @@ namespace TCUApi.Controllers
                     return Ok(respuesta);
                 }
 
-                // Usuario válido
+
                 if (!string.IsNullOrEmpty(result.NombreRol))
                     result.Token = GenerarToken(result.Id_usuario, result.NombreRol);
 
@@ -84,8 +90,10 @@ namespace TCUApi.Controllers
 
 
                 model.Password = CreatePassword();
+                var passwordEncrypted = Encrypt(model.Password);
                 var username = CreateUsername(model.NombreUsuario!, model.Apellidos!);
 
+                
 
                 using (var connection = new SqlConnection(_configuration.GetConnectionString("AbrazosDBConnection")))
                 {
@@ -96,23 +104,48 @@ namespace TCUApi.Controllers
                         model.Apellidos,
                         model.Correo,
                         username,
-                        model.Password,
+                        password = passwordEncrypted,
                     });
 
 
-                    respuesta.Indicador = result > 0;
-                    respuesta.Mensaje = result > 0 ? "Usuario registrado correctamente" : "Error al registrar el usuario";
+                    if (result > 0)
+                    {
+                       
+                        var fechaVencimiento = model.password_temp_expiration = DateTime.Now.AddMinutes(double.Parse(_configuration.GetSection("Variables:MinutosVigenciaTemporal").Value!));
+
+                        var datos = connection.QueryFirstOrDefault<UsuarioModel>("VerificarCorreo",
+                            new { model.Correo });
+
+
+                        string ruta = Path.Combine(Directory.GetCurrentDirectory(), "Templates", "CorreoCodigoAcceso.html");
+                        string contenidoHtml = System.IO.File.ReadAllText(ruta);
+
+                        contenidoHtml = contenidoHtml
+                            .Replace("@@NOMBRE_USUARIO", datos!.NombreUsuario)
+                            .Replace("@@FECHA_GENERACION", DateTime.Now.ToString("dd/MM/yyyy HH:mm"));
+
+                        _general.EnviarCorreo(model.Correo!, "Codigo de acceso", contenidoHtml);
+
+                        respuesta.Indicador = true;
+                        respuesta.Mensaje = "Correo enviado correctamente";
+                        respuesta.Datos = result;
+                    }
+                    else
+                    {
+                        respuesta.Indicador = false;
+                        respuesta.Mensaje = "Su información no se ha validado correctamente";
+                    }
                 }
 
                 return Ok(respuesta);
             }
             catch (SqlException sqlEx)
             {
-                return StatusCode(500, new { error = "Error en la base de datos", detalle = sqlEx.Message });
+                return StatusCode(500, new { error = "Error en la base de datos", Mensaje = sqlEx.Message });
             }
             catch (Exception ex)
             {
-                return BadRequest(new { error = "Error en el servidor", detalle = ex.Message });
+                return BadRequest(new { error = "Error en el servidor", Mensaje = ex.Message });
             }
         }
 
@@ -135,36 +168,66 @@ namespace TCUApi.Controllers
 
 
         #region RecuperarAccesso
-        [HttpPost]
-        [Route("RecuperarAccesso")]
-        public IActionResult RecuperarAccesso(UsuarioModel model)
+        [HttpPut]
+        [Route("RecuperarContrasenna")]
+        public IActionResult RecuperarContrasenna(UsuarioModel model)
         {
+            var respuesta = new RespuestaModel();
+
             using (var context = new SqlConnection(_configuration.GetSection("ConnectionStrings:AbrazosDBConnection").Value))
             {
                 var result = context.QueryFirstOrDefault<UsuarioModel>("VerificarCorreo",
-                    new { model.Correo }, commandType: CommandType.StoredProcedure);
+                    new { model.Correo });
 
-                var respuesta = new RespuestaModel();
                 if (result != null)
                 {
-                    var Codigo = CreatePassword();
-                    var Contrasenna = _general.Encrypt(Codigo);
-                    var ContrasennaAnterior = string.Empty;
-                    
 
-                    context.Execute("ActualizarContrasenna", new { result.Id_usuario, Contrasenna, ContrasennaAnterior });
+                    if(result.NombreEstadoRegistro != "Aceptado")
+                    {
+                        respuesta.Indicador = false;
+                        respuesta.Mensaje = "Usted todavia no tiene acceso al sistema";
+                        return Ok(respuesta);
+                    }
+                    if (result.password_temp_status)
+                    {
+                        respuesta.Indicador = false;
+                        respuesta.Mensaje = "Ya se ha enviado un correo para recuperar la contraseña, por favor revise su bandeja de entrada";
+                        return Ok(respuesta);
+                    }
 
-                    string Contenido = "Hola " + result.NombreUsuario + ". Se ha generado el siguiente código de seguridad: " + Codigo;
-                    EnviarCorreo(result.Correo!, "Actualización de Acceso", Contenido);
+                    string codigo = CreatePassword();
+                    string contrasennaEncriptada = Encrypt(codigo);
+                    string contrasennaAnterior = string.Empty;
+
+
+
+
+                    var fechaVencimiento = model.password_temp_expiration = DateTime.Now.AddMinutes(double.Parse(_configuration.GetSection("Variables:MinutosVigenciaTemporal").Value!));
+
+                    context.Execute("RecuperarContrasenna",
+                        new { result.Id_usuario, Contrasenna = contrasennaEncriptada, ContrasennaAnterior = contrasennaAnterior, VencimientoContraTemp = fechaVencimiento });
+
+
+                    string ruta = Path.Combine(Directory.GetCurrentDirectory(), "Templates", "TemplateCorreoRecuperarContrasena.html");
+                    string contenidoHtml = System.IO.File.ReadAllText(ruta);
+
+                    contenidoHtml = contenidoHtml
+                        .Replace("@@NOMBRE_USUARIO", result.NombreUsuario)
+                        .Replace("@@CODIGO_SEGURIDAD", codigo)
+                        .Replace("@@FECHA_GENERACION", DateTime.Now.ToString("dd/MM/yyyy HH:mm"));
+
+                    _general.EnviarCorreo(result.Correo!, "Actualización de Acceso", contenidoHtml);
 
                     respuesta.Indicador = true;
+                    respuesta.Mensaje = "Correo enviado correctamente";
                     respuesta.Datos = result;
                 }
                 else
                 {
                     respuesta.Indicador = false;
-                    respuesta.Mensaje = "Correo no registrado";
+                    respuesta.Mensaje = "Su información no se ha validado correctamente";
                 }
+
                 return Ok(respuesta);
             }
         }
@@ -173,7 +236,7 @@ namespace TCUApi.Controllers
 
 
         #region token
-        private string GenerarToken(long id,string rol)
+        private string GenerarToken(long id, string rol)
         {
             string SecretKeyt = _configuration.GetSection("Variables:SecretKey").Value!;
 
@@ -189,7 +252,7 @@ namespace TCUApi.Controllers
                 expires: DateTime.Now.AddMinutes(30),
                 signingCredentials: cred);
 
-            return new JwtSecurityTokenHandler().WriteToken(token); 
+            return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
         #endregion
@@ -256,6 +319,35 @@ namespace TCUApi.Controllers
             {
                 client.Send(message);
             }
+        }
+
+        private string Encrypt(string texto)
+        {
+            byte[] iv = new byte[16];
+            byte[] array;
+
+            using (Aes aes = Aes.Create())
+            {
+                aes.Key = Encoding.UTF8.GetBytes(_configuration.GetSection("Variables:llaveCifrado").Value!);
+                aes.IV = iv;
+
+                ICryptoTransform encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
+
+                using (MemoryStream memoryStream = new MemoryStream())
+                {
+                    using (CryptoStream cryptoStream = new CryptoStream(memoryStream, encryptor, CryptoStreamMode.Write))
+                    {
+                        using (StreamWriter streamWriter = new StreamWriter(cryptoStream))
+                        {
+                            streamWriter.Write(texto);
+                        }
+
+                        array = memoryStream.ToArray();
+                    }
+                }
+            }
+
+            return Convert.ToBase64String(array);
         }
 
         #endregion

@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using System.Data;
@@ -27,42 +28,83 @@ namespace TCUApi.Controllers
 
         #region -----Usuarios-----
 
-        [HttpPost]
+        [HttpPut]
         [Route("AccesoUsuarios")]
         public IActionResult AccesoUsuarios(UsuarioModel model)
         {
+            //if (!_general.EsAdministrador(User.Claims))
+            //{
+            //    return Unauthorized(new { mensaje = "No tiene permisos para realizar esta acción" });
+            //}
+
             using (var context = new SqlConnection(_configuration.GetSection("ConnectionStrings:AbrazosDBConnection").Value))
             {
-                var result = context.QueryFirstOrDefault<UsuarioModel>("AccesoUsuarios",
-                    new { model.Id_EstadoRegistro,  }, commandType: CommandType.StoredProcedure);
+                var nombreEstado = context.ExecuteScalar<string>("AccesoUsuarios",
+                    new { model.Id_EstadoRegistro, model.Id_usuario }, commandType: CommandType.StoredProcedure);
 
                 var respuesta = new RespuestaModel();
+                string rutaPlantilla = "";
+                string contenidoHtml = "";
 
-                if (result == null)
+
+                var result = context.QueryFirstOrDefault<UsuarioModel>("VerificarCorreo",
+                    new { model.Correo });
+
+                if (nombreEstado == "ELIMINADO")
+                {
+                    respuesta.Indicador = true;
+                    respuesta.Mensaje = "El usuario fue eliminado correctamente.";
+                    rutaPlantilla = Path.Combine(Directory.GetCurrentDirectory(), "Templates", "TemplateUsuarioDenegado.html");
+                }
+                else if (!string.IsNullOrEmpty(nombreEstado))
+                {
+                    respuesta.Indicador = true;
+                    respuesta.Mensaje = "El estado del registro del usuario ha sido actualizado a " + nombreEstado;
+                    rutaPlantilla = Path.Combine(Directory.GetCurrentDirectory(), "Templates", "TemplateEstadoAceptado.html");
+
+                    
+                    if (nombreEstado == "Aceptado")
+                    {
+                        string codigo = CreatePassword();
+                        string contrasennaEncriptada = Encrypt(codigo);
+                        string contrasennaAnterior = string.Empty;
+
+                        var fechaVencimiento = model.password_temp_expiration = DateTime.Now.AddMinutes(double.Parse(_configuration.GetSection("Variables:MinutosVigenciaTemporal").Value!));
+                       
+                        context.Execute("RecuperarContrasenna",
+                            new { result!.Id_usuario, Contrasenna = contrasennaEncriptada, ContrasennaAnterior = contrasennaAnterior, VencimientoContraTemp = fechaVencimiento });
+                        
+                        contenidoHtml = System.IO.File.ReadAllText(rutaPlantilla); 
+                        contenidoHtml = contenidoHtml.Replace("@@Codigo", codigo); 
+                    }
+                }
+                else
                 {
                     respuesta.Indicador = false;
-                    respuesta.Mensaje = "Usuario o contraseña incorrectos";
-                    return Ok(respuesta);
+                    respuesta.Mensaje = "No se ha podido actualizar el estado del usuario.";
                 }
 
-                if (result.Id_EstadoRegistro == 3)
+                if (System.IO.File.Exists(rutaPlantilla))
                 {
-                    respuesta.Indicador = false;
-                    respuesta.Mensaje = "Usted está en lista de espera, no puede acceder al sistema";
-                    return Ok(respuesta);
+                    if (string.IsNullOrEmpty(contenidoHtml)) 
+                    {
+                        contenidoHtml = System.IO.File.ReadAllText(rutaPlantilla);
+                    }
+
+                    contenidoHtml = contenidoHtml
+                        .Replace("@@NOMBRE_USUARIO", result!.NombreUsuario)
+                        .Replace("@@FECHA_GENERACION", DateTime.Now.ToString("dd/MM/yyyy HH:mm"))
+                        .Replace("@@ESTADO_NUEVO", nombreEstado);
+
+                    _general.EnviarCorreo(model.Correo!, "Actualización de Acceso", contenidoHtml);
                 }
-
-                // Usuario válido
-                if (!string.IsNullOrEmpty(result.NombreRol))
-                    result.Token = GenerarToken(result.Id_usuario, result.NombreRol);
-
-                respuesta.Indicador = true;
-                respuesta.Datos = result;
-                respuesta.Mensaje = "Se ha iniciado sesión con éxito";
 
                 return Ok(respuesta);
             }
         }
+
+
+
 
 
         [HttpPut]
@@ -145,14 +187,14 @@ namespace TCUApi.Controllers
         {
             try
             {
-                ////if (!_general.EsAdministrador(User.Claims))
-                ////{
-                ////    return Unauthorized(new { mensaje = "No tiene permisos para realizar esta acción" });
-                ////}
+                if (!_general.EsAdministrador(User.Claims))
+                {
+                    return Unauthorized(new { mensaje = "No tiene permisos para realizar esta acción" });
+                }
                 using (var connection = new SqlConnection(_configuration.GetConnectionString("AbrazosDBConnection")))
                 {
                     var result = connection.Query<UsuarioModel>("ObtenerUsuarios", new { Id_usuario = 0 }, commandType: CommandType.StoredProcedure).ToList();
-                    return Ok(new RespuestaModel {  Indicador = true, Datos = result });
+                    return Ok(new RespuestaModel { Indicador = true, Datos = result });
                 }
             }
             catch (SqlException sqlEx)
@@ -324,8 +366,34 @@ namespace TCUApi.Controllers
             return res.ToString();
 
         }
+        private string Encrypt(string texto)
+        {
+            byte[] iv = new byte[16];
+            byte[] array;
 
-        
+            using (Aes aes = Aes.Create())
+            {
+                aes.Key = Encoding.UTF8.GetBytes(_configuration.GetSection("Variables:llaveCifrado").Value!);
+                aes.IV = iv;
+
+                ICryptoTransform encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
+
+                using (MemoryStream memoryStream = new MemoryStream())
+                {
+                    using (CryptoStream cryptoStream = new CryptoStream(memoryStream, encryptor, CryptoStreamMode.Write))
+                    {
+                        using (StreamWriter streamWriter = new StreamWriter(cryptoStream))
+                        {
+                            streamWriter.Write(texto);
+                        }
+
+                        array = memoryStream.ToArray();
+                    }
+                }
+            }
+
+            return Convert.ToBase64String(array);
+        }
 
 
     }
