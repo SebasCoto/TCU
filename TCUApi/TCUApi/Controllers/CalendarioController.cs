@@ -39,6 +39,8 @@ namespace TCUApi.Controllers
 
                 using (var connection = new SqlConnection(_configuration.GetConnectionString("AbrazosDBConnection")))
                 {
+                    
+
                     var result = connection.Execute("RegistrarEvento", new
                     {
                         model.Nombre_Evento,
