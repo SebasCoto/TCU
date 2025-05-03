@@ -12,7 +12,7 @@ using TCUApi.Servicios;
 
 namespace TCUApi.Controllers
 {
-    //[Authorize]
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class UsuarioController : ControllerBase
@@ -28,80 +28,7 @@ namespace TCUApi.Controllers
 
         #region -----Usuarios-----
 
-        [HttpPut]
-        [Route("AccesoUsuarios")]
-        public IActionResult AccesoUsuarios(UsuarioModel model)
-        {
-            //if (!_general.EsAdministrador(User.Claims))
-            //{
-            //    return Unauthorized(new { mensaje = "No tiene permisos para realizar esta acción" });
-            //}
-
-            using (var context = new SqlConnection(_configuration.GetSection("ConnectionStrings:AbrazosDBConnection").Value))
-            {
-                var nombreEstado = context.ExecuteScalar<string>("AccesoUsuarios",
-                    new { model.Id_EstadoRegistro, model.Id_usuario }, commandType: CommandType.StoredProcedure);
-
-                var respuesta = new RespuestaModel();
-                string rutaPlantilla = "";
-                string contenidoHtml = "";
-
-
-                var result = context.QueryFirstOrDefault<UsuarioModel>("VerificarCorreo",
-                    new { model.Correo });
-
-                if (nombreEstado == "ELIMINADO")
-                {
-                    respuesta.Indicador = true;
-                    respuesta.Mensaje = "El usuario fue eliminado correctamente.";
-                    rutaPlantilla = Path.Combine(Directory.GetCurrentDirectory(), "Templates", "TemplateUsuarioDenegado.html");
-                }
-                else if (!string.IsNullOrEmpty(nombreEstado))
-                {
-                    respuesta.Indicador = true;
-                    respuesta.Mensaje = "El estado del registro del usuario ha sido actualizado a " + nombreEstado;
-                    rutaPlantilla = Path.Combine(Directory.GetCurrentDirectory(), "Templates", "TemplateEstadoAceptado.html");
-
-                    
-                    if (nombreEstado == "Aceptado")
-                    {
-                        string codigo = CreatePassword();
-                        string contrasennaEncriptada = Encrypt(codigo);
-                        string contrasennaAnterior = string.Empty;
-
-                        var fechaVencimiento = model.password_temp_expiration = DateTime.Now.AddMinutes(double.Parse(_configuration.GetSection("Variables:MinutosVigenciaTemporal").Value!));
-                       
-                        context.Execute("RecuperarContrasenna",
-                            new { result!.Id_usuario, Contrasenna = contrasennaEncriptada, ContrasennaAnterior = contrasennaAnterior, VencimientoContraTemp = fechaVencimiento });
-                        
-                        contenidoHtml = System.IO.File.ReadAllText(rutaPlantilla); 
-                        contenidoHtml = contenidoHtml.Replace("@@Codigo", codigo); 
-                    }
-                }
-                else
-                {
-                    respuesta.Indicador = false;
-                    respuesta.Mensaje = "No se ha podido actualizar el estado del usuario.";
-                }
-
-                if (System.IO.File.Exists(rutaPlantilla))
-                {
-                    if (string.IsNullOrEmpty(contenidoHtml)) 
-                    {
-                        contenidoHtml = System.IO.File.ReadAllText(rutaPlantilla);
-                    }
-
-                    contenidoHtml = contenidoHtml
-                        .Replace("@@NOMBRE_USUARIO", result!.NombreUsuario)
-                        .Replace("@@FECHA_GENERACION", DateTime.Now.ToString("dd/MM/yyyy HH:mm"))
-                        .Replace("@@ESTADO_NUEVO", nombreEstado);
-
-                    _general.EnviarCorreo(model.Correo!, "Actualización de Acceso", contenidoHtml);
-                }
-
-                return Ok(respuesta);
-            }
-        }
+        
 
 
 
@@ -139,11 +66,11 @@ namespace TCUApi.Controllers
             }
             catch (SqlException sqlEx)
             {
-                return StatusCode(500, new { error = "Error en la base de datos", detalle = sqlEx.Message });
+                return StatusCode(500, new { Indicador = false, Mensaje = sqlEx.Message });
             }
             catch (Exception ex)
             {
-                return BadRequest(new { error = "Error en el servidor", detalle = ex.Message });
+                return BadRequest(new { Indicador = false, Mensaje = ex.Message });
             }
         }
 
@@ -151,7 +78,7 @@ namespace TCUApi.Controllers
 
         [HttpDelete]
         [Route("EliminarUsuario")]
-        public IActionResult EliminarUsuario([FromBody] UsuarioModel model)
+        public IActionResult EliminarUsuario(int id)
         {
             try
             {
@@ -162,7 +89,7 @@ namespace TCUApi.Controllers
 
                 using (var context = new SqlConnection(_configuration.GetConnectionString("AbrazosDBConnection")))
                 {
-                    var result = context.Execute("EliminarUsuario", new { model.Id_usuario });
+                    var result = context.Execute("EliminarUsuario", new { Id_Usuario = id });
 
                     return Ok(new RespuestaModel
                     {
@@ -187,13 +114,40 @@ namespace TCUApi.Controllers
         {
             try
             {
+                long idUsuario = _general.ObtenerUsuarioFromToken(User.Claims);
+
                 if (!_general.EsAdministrador(User.Claims))
                 {
                     return Unauthorized(new { mensaje = "No tiene permisos para realizar esta acción" });
                 }
                 using (var connection = new SqlConnection(_configuration.GetConnectionString("AbrazosDBConnection")))
                 {
-                    var result = connection.Query<UsuarioModel>("ObtenerUsuarios", new { Id_usuario = 0 }, commandType: CommandType.StoredProcedure).ToList();
+                    var result = connection.Query<UsuarioModel>("ObtenerVoluntarios", new { Id_usuario = idUsuario }, commandType: CommandType.StoredProcedure).ToList();
+                    return Ok(new RespuestaModel { Indicador = true, Datos = result });
+                }
+            }
+            catch (SqlException sqlEx)
+            {
+                return StatusCode(500, new { error = "Error en la base de datos", detalle = sqlEx.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = "Error en el servidor", detalle = ex.Message });
+            }
+
+
+        }
+
+        [HttpGet]
+        [Route("ObtenerUsuarioById")]
+        public IActionResult ObtenerUsuarioById(long id)
+        {
+            try
+            {
+
+                using (var connection = new SqlConnection(_configuration.GetConnectionString("AbrazosDBConnection")))
+                {
+                    var result = connection.Query<UsuarioModel>("ObtenerUsuarios", new { Id_usuario = id }, commandType: CommandType.StoredProcedure).ToList();
                     return Ok(new RespuestaModel { Indicador = true, Datos = result });
                 }
             }
@@ -237,6 +191,8 @@ namespace TCUApi.Controllers
                 }
 
                 string encryptedPassword = _general.Encrypt(model.Password!);
+                string encryptedPasswordConfirm = _general.Encrypt(model.ConfirmPassword!);
+                string encryptedPasswordOld = _general.Encrypt(model.OldPassword!);
                 long idUsuario = _general.ObtenerUsuarioFromToken(User.Claims);
 
                 using (var connection = new SqlConnection(_configuration.GetConnectionString("AbrazosDBConnection")))
@@ -250,9 +206,9 @@ namespace TCUApi.Controllers
                             new
                             {
                                 Id_usuario = idUsuario,
-                                Password = encryptedPassword,
-                                model.OldPassword,
-                                model.ConfirmPassword,
+                                Contrasena = encryptedPassword,
+                                ContrasennaAnterior = encryptedPasswordOld,
+                                ContrasennaConfirmar = encryptedPasswordConfirm,
                             },
                             transaction,
                             commandType: CommandType.StoredProcedure
@@ -273,7 +229,7 @@ namespace TCUApi.Controllers
             }
             catch (SqlException sqlEx)
             {
-                return StatusCode(500, new { error = "Error en la base de datos", detalle = sqlEx.Message });
+                return StatusCode(500, new { Indicador = false , Mensaje = sqlEx.Message });
             }
             catch (Exception ex)
             {
@@ -311,11 +267,11 @@ namespace TCUApi.Controllers
             }
             catch (SqlException sqlEx)
             {
-                return StatusCode(500, new { error = "Error en la base de datos", detalle = sqlEx.Message });
+                return StatusCode(500, new { error = "Error en la base de datos", Mensaje = sqlEx.Message });
             }
             catch (Exception ex)
             {
-                return BadRequest(new { error = "Error en el servidor", detalle = ex.Message });
+                return BadRequest(new { error = "Error en el servidor", Mensaje = ex.Message });
             }
         }
 
@@ -325,10 +281,7 @@ namespace TCUApi.Controllers
         {
             try
             {
-                if (!_general.EsAdministrador(User.Claims))
-                {
-                    return Unauthorized(new { mensaje = "No tiene permisos para realizar esta acción" });
-                }
+                
                 long idUsuario = _general.ObtenerUsuarioFromToken(User.Claims);
 
                 using (var connection = new SqlConnection(_configuration.GetConnectionString("AbrazosDBConnection")))
@@ -352,48 +305,39 @@ namespace TCUApi.Controllers
 
 
 
-
-        private string CreatePassword()
+        [HttpGet]
+        [Route("ObtenerRoles")]
+        public IActionResult ObtenerRoles()
         {
-            int length = 10;
-            const string valid = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
-            StringBuilder res = new StringBuilder();
-            Random rnd = new Random();
-            while (0 < length--)
+            try
             {
-                res.Append(valid[rnd.Next(valid.Length)]);
-            }
-            return res.ToString();
-
-        }
-        private string Encrypt(string texto)
-        {
-            byte[] iv = new byte[16];
-            byte[] array;
-
-            using (Aes aes = Aes.Create())
-            {
-                aes.Key = Encoding.UTF8.GetBytes(_configuration.GetSection("Variables:llaveCifrado").Value!);
-                aes.IV = iv;
-
-                ICryptoTransform encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
-
-                using (MemoryStream memoryStream = new MemoryStream())
+               
+                using (var connection = new SqlConnection(_configuration.GetConnectionString("AbrazosDBConnection")))
                 {
-                    using (CryptoStream cryptoStream = new CryptoStream(memoryStream, encryptor, CryptoStreamMode.Write))
-                    {
-                        using (StreamWriter streamWriter = new StreamWriter(cryptoStream))
-                        {
-                            streamWriter.Write(texto);
-                        }
+                    var result = connection.Query<RolModel>("ObtenerRoles",  commandType: CommandType.StoredProcedure).ToList();
 
-                        array = memoryStream.ToArray();
-                    }
+                    var roles = result.Select(rol => new
+                    {
+                        id = rol.id_rol,
+                        text = rol.nombre
+                    }).ToList();
+
+                    return Ok(new RespuestaModel { Indicador = true, Datos = result });
                 }
             }
+            catch (SqlException sqlEx)
+            {
+                return StatusCode(500, new { error = "Error en la base de datos", detalle = sqlEx.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = "Error en el servidor", detalle = ex.Message });
+            }
 
-            return Convert.ToBase64String(array);
         }
+
+
+        
 
 
     }

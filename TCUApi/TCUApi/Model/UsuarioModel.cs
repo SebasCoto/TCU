@@ -20,5 +20,8 @@
         public DateTime fecha_registro { get; set; }
         public bool password_temp_status { get; set; }
         public DateTime password_temp_expiration { get; set; }
+
+        public string? imgUsuario { get; set; }
+        public string? mensaje { get; set; }
     }
 }

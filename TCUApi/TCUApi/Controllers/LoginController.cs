@@ -43,7 +43,7 @@ namespace TCUApi.Controllers
 
                 var contraEncriptada = Encrypt(model.Password!);
                 var result = context.QueryFirstOrDefault<UsuarioModel>("IniciarSesion",
-                    new { NombreUsuario =model.Username, password = contraEncriptada }, commandType: CommandType.StoredProcedure);
+                    new { model.Username, password = contraEncriptada }, commandType: CommandType.StoredProcedure);
 
                 var respuesta = new RespuestaModel();
 
@@ -61,6 +61,12 @@ namespace TCUApi.Controllers
                     return Ok(respuesta);
                 }
 
+                if(result.password_temp_expiration > DateTime.Now)
+                {
+                    respuesta.Indicador = false;
+                    respuesta.Mensaje = "El tiempo de la contraseña temporal expiro";
+                    return Ok(respuesta);
+                }
 
                 if (!string.IsNullOrEmpty(result.NombreRol))
                     result.Token = GenerarToken(result.Id_usuario, result.NombreRol);

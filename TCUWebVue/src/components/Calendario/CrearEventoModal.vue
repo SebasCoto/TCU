@@ -31,7 +31,7 @@
           </svg>
         </button>
       </div>
-      <div class="modal-body overflow-y-auto w-full">
+      <div class="modal-body w-full">
         <form @submit.prevent="guardarEvento" class="space-y-4">
           <div>
             <label for="correo-multiselect">Selecciona correos:</label>
@@ -53,7 +53,6 @@
                 <span class="text-gray-500">No se encontraron voluntarios.</span>
               </template>
             </multiselect>
-            <p>Correos seleccionados: {{ selectedCorreos }}</p>
           </div>
 
           <div class="form-group mb-4">
@@ -137,115 +136,33 @@
 </template>
 
 <script>
-import { ref, watch } from 'vue'
+import '@/assets/Js/modalCrearFunciones.js'
+import modalCrearFunciones from '@/assets/Js/modalCrearFunciones.js'
 import Multiselect from 'vue-multiselect'
-import {
-  obtenerCorreos,
-  guardarEvento as guardarEventoService,
-} from '@/services/Calendario/CalendarioService.js'
 
 export default {
-  name: 'CrearEventoModal',
   components: {
     Multiselect,
   },
   props: {
-    modalVisible: Boolean,
+    modalVisible: {
+      type: Boolean,
+      required: true,
+    },
   },
-  emits: ['cerrar'],
   setup(props, { emit }) {
-    const correos = ref([])
-    const selectedCorreos = ref([])
-    const loading = ref(false)
-    const mensaje = ref('')
-    const errorMsg = ref('')
-    const evento = ref({
-      titulo: '',
-      descripcion: '',
-      fechaInicio: '',
-      fechaFinal: '', // Agregada aquí
-      color: '#ffffff',
-    })
-
-    const cargarCorreos = async () => {
-      loading.value = true
-      try {
-        const resultados = await obtenerCorreos('')
-        correos.value = resultados.map((correo) => ({
-          id: correo.id,
-          text: correo.text,
-        }))
-      } catch (error) {
-        console.error('Error al cargar correos:', error)
-      } finally {
-        loading.value = false
-      }
-    }
-
-    const buscarCorreos = async (query) => {
-      if (!query) return
-      loading.value = true
-      try {
-        const resultados = await obtenerCorreos(query)
-        correos.value = resultados.map((correo) => ({
-          id: correo.id,
-          text: correo.text,
-        }))
-      } catch (error) {
-        console.error('Error al buscar correos:', error)
-      } finally {
-        loading.value = false
-      }
-    }
-
-    watch(
-      () => props.modalVisible,
-      (nuevoValor) => {
-        if (nuevoValor) {
-          console.log('Modal abierto, cargando correos...')
-          cargarCorreos() // Solo cargar correos cuando el modal esté abierto
-        } else {
-          console.log('Modal cerrado, limpiando datos...')
-          correos.value = [] // Limpia los datos si es necesario
-          selectedCorreos.value = []
-          errorMsg.value = ''
-          mensaje.value = ''
-        }
-      },
-    )
-
-    const guardarEvento = async () => {
-      console.log('Intentando guardar el evento...')
-
-      const eventoData = {
-        Nombre_Evento: evento.value.titulo,
-        Descripcion: evento.value.descripcion,
-        Fecha_Inicio: evento.value.fechaInicio,
-        Fecha_Final: evento.value.fechaFinal,
-        Color: evento.value.color,
-        Invitados: selectedCorreos.value.map((correo) => correo.id).join(','), // Convertir a cadena separada por comas
-      }
-
-      console.log('Datos del evento a enviar:', eventoData)
-
-      errorMsg.value = ''
-      mensaje.value = ''
-
-      try {
-        const respuesta = await guardarEventoService(eventoData)
-        mensaje.value = respuesta.Mensaje
-        console.log('Evento guardado:', respuesta)
-        cerrarModal()
-      } catch (error) {
-        console.error('Detalles del error:', error.response?.data)
-        errorMsg.value = error.response?.data?.detalle || error.message
-        console.error('Error al guardar evento:', error)
-      }
-    }
-
-    const cerrarModal = () => {
-      emit('cerrar')
-    }
+    // Usa las funciones y variables del archivo JS
+    const {
+      correos,
+      selectedCorreos,
+      loading,
+      buscarCorreos,
+      guardarEvento,
+      cerrarModal,
+      mensaje,
+      errorMsg,
+      evento,
+    } = modalCrearFunciones.setup(props, { emit })
 
     return {
       correos,

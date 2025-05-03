@@ -15,7 +15,7 @@ import NavBar from '@/components/NavBar.vue'
       <NavBar />
 
       <main class="p-6 overflow-auto flex-1 bg-gray-100">
-        <div class="bg-white rounded-lg shadow-lg p-6">
+        <div class="bg-white rounded-lg shadow-lg p-6 h-auto">
           <router-view />
         </div>
       </main>

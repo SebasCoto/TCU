@@ -1,4 +1,5 @@
 import axios from 'axios'
+import router from '@/router' // Importa el enrutador de Vue
 
 const Api = axios.create({
   baseURL: 'https://localhost:7216/api',
@@ -28,7 +29,10 @@ Api.interceptors.response.use(
     if (error.response && error.response.status === 401) {
       console.warn('Token inválido o expirado')
       localStorage.removeItem('authToken')
-      window.location.href = '/'
+      router.push({
+        path: '/login',
+        query: { message: 'Token expirado, por favor inicie sesión nuevamente' },
+      })
     }
     return Promise.reject(error)
   },

@@ -316,10 +316,7 @@ namespace TCUApi.Controllers
 
             try
             {
-                if (!_general.EsAdministrador(User.Claims))
-                {
-                    return Unauthorized(new { mensaje = "No tiene permisos para obtener un evento" });
-                }
+                
 
                 using (var connection = new SqlConnection(_configuration.GetConnectionString("AbrazosDBConnection")))
                 {

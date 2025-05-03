@@ -1,5 +1,5 @@
 <template>
-  <header class="flex items-center justify-between px-6 py-4 bg-white border-b-4 border-indigo-600">
+  <header class="flex items-center justify-between px-6 py-4 bg-white">
     <div class="flex items-center">
       <button @click="isOpen = true" class="text-gray-500 focus:outline-none lg:hidden">
         <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -46,25 +46,19 @@
           />
         </svg>
       </button>
-      <span v-if="userName" class="text-black mr-3">{{ userName }}</span>
+      <span v-if="nombreUsuario" class="text-black mr-3">{{ nombreUsuario }}</span>
 
-      <div class="relative">
+      <div class="relative" @mouseenter="hovering = true" @mouseleave="hovering = false">
         <button
           @click="dropdownOpen = !dropdownOpen"
           class="relative z-10 block w-8 h-8 overflow-hidden rounded-full shadow focus:outline-none"
         >
           <img
             class="object-cover w-full h-full"
-            src="https://images.unsplash.com/photo-1528892952291-009c663ce843?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=296&q=80"
+            src="https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg"
             alt="Your avatar"
           />
         </button>
-
-        <div
-          v-show="dropdownOpen"
-          @click="dropdownOpen = false"
-          class="fixed inset-0 z-10 w-full h-full"
-        ></div>
 
         <transition
           enter-active-class="transition duration-150 ease-out transform"
@@ -75,19 +69,17 @@
           leave-to-class="scale-95 opacity-0"
         >
           <div
-            v-show="dropdownOpen"
+            v-show="dropdownOpen || hovering"
             class="absolute right-0 z-20 w-48 py-2 mt-2 bg-white rounded-md shadow-xl"
           >
-            <a
-              href="#"
+            <router-link
+              to="/perfil"
               class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-black"
-              >Profile</a
+              @click="obtenerPerfil"
             >
-            <a
-              href="#"
-              class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-black"
-              >Products</a
-            >
+              Perfil
+            </router-link>
+
             <button
               @click="logout"
               class="w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-red-600"
@@ -105,12 +97,21 @@
 import { useSidebar } from '../hooks/useSidebar'
 import { useLoginStore } from '@/stores/Login/LoginStore'
 import { storeToRefs } from 'pinia'
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
+import { obtenerPerfil } from '@/services/perfil/perfilServices'
 
 const dropdownOpen = ref(false)
+const hovering = ref(false)
+
+watch(hovering, (val) => {
+  if (!val) {
+    dropdownOpen.value = false
+  }
+})
+
 const { isOpen } = useSidebar()
 const loginStore = useLoginStore()
-const { userName } = storeToRefs(loginStore)
+const { nombreUsuario } = storeToRefs(loginStore)
 
 const logout = () => {
   console.log('logout ejecutado')

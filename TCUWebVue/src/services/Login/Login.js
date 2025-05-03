@@ -3,7 +3,7 @@ import { useRouter } from 'vue-router'
 
 const router = useRouter()
 function login(usuario) {
-  if (usuario.Username === '' || usuario.Password === '') {
+  if (usuario.username === '' || usuario.Password === '') {
     return Promise.reject(new Error('Username and password are required'))
   }
 
