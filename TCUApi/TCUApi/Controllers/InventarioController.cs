@@ -30,10 +30,7 @@ namespace TCUApi.Controllers
         {
             try
             {
-                if (!_general.EsAdministrador(User.Claims))
-                {
-                    return Unauthorized(new { mensaje = "No tiene permisos para actualizar el inventario" });
-                }
+               
 
                 RespuestaModel respuesta = new RespuestaModel();
 
@@ -63,16 +60,45 @@ namespace TCUApi.Controllers
             }
         }
 
+
+        [HttpGet]
+        [Route("ObtenerCategorias")]
+        public IActionResult ObtenerCategorias()
+        {
+            try
+            {
+
+                using (var connection = new SqlConnection(_configuration.GetConnectionString("AbrazosDBConnection")))
+                {
+                    var result = connection.Query<CategoriaModel>("ObtenerCategorias", commandType: CommandType.StoredProcedure).ToList();
+
+                    var categorias = result.Select(categoria => new
+                    {
+                        id = categoria.id_categoria,
+                        text = categoria.nombre
+                    }).ToList();
+
+                    return Ok(new RespuestaModel { Indicador = true, Datos = result });
+                }
+            }
+            catch (SqlException sqlEx)
+            {
+                return StatusCode(500, new { error = "Error en la base de datos", detalle = sqlEx.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = "Error en el servidor", detalle = ex.Message });
+            }
+
+        }
+
         [HttpPut]
         [Route("ActualizarProducto")]
         public IActionResult ActualizarProducto(InventarioModel model)
         {
             try
             {
-                if (!_general.EsAdministrador(User.Claims))
-                {
-                    return Unauthorized(new { mensaje = "No tiene permisos para actualizar el inventario" });
-                }
+                
 
                 using (var context = new SqlConnection(_configuration.GetConnectionString("AbrazosDBConnection")))
                 {
@@ -93,29 +119,30 @@ namespace TCUApi.Controllers
             }
             catch (SqlException sqlEx)
             {
-                return StatusCode(500, new { error = "Error en la base de datos", detalle = sqlEx.Message });
+                return StatusCode(500, new { Indicador = false, Mensaje = sqlEx.Message });
             }
             catch (Exception ex)
             {
-                return BadRequest(new { error = "Error en el servidor", detalle = ex.Message });
+                return BadRequest(new { Indicador = false, Mensaje = ex.Message });
             }
         }
 
 
         [HttpDelete]
         [Route("EliminarProducto")]
-        public IActionResult EliminarProducto([FromBody] InventarioModel model)
+        public IActionResult EliminarProducto(int id)
         {
             try
             {
-                if (!_general.EsAdministrador(User.Claims))
-                {
-                    return Unauthorized(new { mensaje = "No tiene permisos para eliminar un producto del inventario" });
-                }
+                
 
                 using (var context = new SqlConnection(_configuration.GetConnectionString("AbrazosDBConnection")))
                 {
-                    var result = context.Execute("EliminarProducto", new { model.Id_Inventario });
+                    var result = context.Execute(
+                        "EliminarProducto",
+                        new { Id_Inventario = id },
+                        commandType: CommandType.StoredProcedure
+                    );
 
                     return Ok(new RespuestaModel
                     {
@@ -141,14 +168,49 @@ namespace TCUApi.Controllers
         {
             try
             {
-                if (!_general.EsAdministrador(User.Claims))
-                {
-                    return Unauthorized(new { mensaje = "No tiene permisos para realizar esta acción" });
-                }
+                
 
                 using (var connection = new SqlConnection(_configuration.GetConnectionString("AbrazosDBConnection")))
                 {
                     var result = connection.Query<InventarioModel>("ObtenerProductos", new { Id_Inventario = 0 }, commandType: CommandType.StoredProcedure).ToList();
+                    if (!result.Any())
+                    {
+                        return Ok(new RespuestaModel
+                        {
+                            Indicador = false,
+                            Mensaje = "No se encontraron productos"
+                        });
+                    }
+
+                    return Ok(new RespuestaModel { Indicador = true, Datos = result });
+
+
+                }
+            }
+            catch (SqlException sqlEx)
+            {
+                return StatusCode(500, new { error = "Error en la base de datos", detalle = sqlEx.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = "Error en el servidor", detalle = ex.Message });
+            }
+
+
+        }
+
+
+        [HttpGet]
+        [Route("ObtenerProductoById")]
+        public IActionResult ObtenerProductoById(int id)
+        {
+            try
+            {
+                
+
+                using (var connection = new SqlConnection(_configuration.GetConnectionString("AbrazosDBConnection")))
+                {
+                    var result = connection.Query<InventarioModel>("ObtenerProductos", new { Id_Inventario = id }, commandType: CommandType.StoredProcedure).ToList();
                     if (!result.Any())
                     {
                         return Ok(new RespuestaModel

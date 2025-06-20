@@ -38,8 +38,7 @@ namespace TCUApi.Controllers
 
             using (var context = new SqlConnection(_configuration.GetSection("ConnectionStrings:AbrazosDBConnection").Value))
             {
-                var nombreEstado = context.ExecuteScalar<string>("AccesoUsuarios",
-                    new { model.Id_EstadoRegistro, model.Id_usuario }, commandType: CommandType.StoredProcedure);
+                
 
                 var respuesta = new RespuestaModel();
                 string rutaPlantilla = "";
@@ -48,57 +47,71 @@ namespace TCUApi.Controllers
                 var result = context.QueryFirstOrDefault<UsuarioModel>("VerificarCorreo",
                     new { model.Correo });
 
-                if (nombreEstado == "ELIMINADO")
-                {
-                    respuesta.Indicador = true;
-                    respuesta.Mensaje = "El usuario fue eliminado correctamente.";
-                    rutaPlantilla = Path.Combine(Directory.GetCurrentDirectory(), "Templates", "TemplateUsuarioDenegado.html");
-                }
-                else if (!string.IsNullOrEmpty(nombreEstado))
-                {
-                    respuesta.Indicador = true;
-                    respuesta.Mensaje = "El estado del registro del usuario ha sido actualizado a " + nombreEstado;
-                    rutaPlantilla = Path.Combine(Directory.GetCurrentDirectory(), "Templates", "TemplateEstadoAceptado.html");
+                var nombreEstado = context.ExecuteScalar<string>("AccesoUsuarios",
+                    new { model.Id_EstadoRegistro, model.Id_usuario }, commandType: CommandType.StoredProcedure);
 
-                    if (nombreEstado == "Aceptado")
+                if (result != null)
+                {
+                    if (nombreEstado == "ELIMINADO")
                     {
-                        string codigo = CreatePassword();
-                        string contrasennaEncriptada = Encrypt(codigo);
-                        string contrasennaAnterior = string.Empty;
-
-                        var fechaVencimiento = model.password_temp_expiration = DateTime.Now.AddMinutes(
-                            double.Parse(_configuration.GetSection("Variables:MinutosVigenciaTemporal").Value!));
-
-                        context.Execute("RecuperarContrasenna",
-                            new { result!.Id_usuario, Contrasenna = contrasennaEncriptada, ContrasennaAnterior = contrasennaAnterior, VencimientoContraTemp = fechaVencimiento });
-
-                        contenidoHtml = System.IO.File.ReadAllText(rutaPlantilla);
-                        contenidoHtml = contenidoHtml.Replace("@@Codigo", codigo);
+                        respuesta.Indicador = true;
+                        respuesta.Mensaje = "El usuario fue eliminado correctamente.";
+                        rutaPlantilla = Path.Combine(Directory.GetCurrentDirectory(), "Templates", "TemplateUsuarioDenegado.html");
                     }
+                    else if (!string.IsNullOrEmpty(nombreEstado))
+                    {
+                        respuesta.Indicador = true;
+                        respuesta.Mensaje = "El estado del registro del usuario ha sido actualizado a " + nombreEstado;
+                        rutaPlantilla = Path.Combine(Directory.GetCurrentDirectory(), "Templates", "TemplateEstadoAceptado.html");
+
+                        if (nombreEstado == "Aceptado")
+                        {
+                            string codigo = CreatePassword();
+                            string contrasennaEncriptada = Encrypt(codigo);
+                            string contrasennaAnterior = string.Empty;
+
+                            var fechaVencimiento = model.password_temp_expiration = DateTime.Now.AddMinutes(
+                                double.Parse(_configuration.GetSection("Variables:MinutosVigenciaTemporal").Value!));
+
+                            context.Execute("RecuperarContrasenna",
+                                new { result!.Id_usuario, Contrasenna = contrasennaEncriptada, ContrasennaAnterior = contrasennaAnterior, VencimientoContraTemp = fechaVencimiento });
+
+                            contenidoHtml = System.IO.File.ReadAllText(rutaPlantilla);
+                            contenidoHtml = contenidoHtml.Replace("@@Codigo", codigo);
+                        }
+                    }
+                    else
+                    {
+                        respuesta.Indicador = false;
+                        respuesta.Mensaje = "No se ha podido actualizar el estado del usuario.";
+                    }
+
+                    if (System.IO.File.Exists(rutaPlantilla))
+                    {
+                        if (string.IsNullOrEmpty(contenidoHtml))
+                        {
+                            contenidoHtml = System.IO.File.ReadAllText(rutaPlantilla);
+                        }
+
+                        contenidoHtml = contenidoHtml
+                            .Replace("@@NOMBRE_USUARIO", result!.NombreUsuario)
+                            .Replace("@@FECHA_GENERACION", DateTime.Now.ToString("dd/MM/yyyy HH:mm"))
+                            .Replace("@@NOMBRE_INGRESO", result!.Username)
+                            .Replace("@@ESTADO_NUEVO", nombreEstado);
+
+                        string mensajeExtra = string.IsNullOrEmpty(mensaje) ? "" : mensaje;
+                        contenidoHtml = contenidoHtml.Replace("@@MENSAJE_EXTRA", mensajeExtra);
+
+                        _general.EnviarCorreo(model.Correo!, "Actualización de Acceso", contenidoHtml);
+                    }
+
                 }
                 else
                 {
                     respuesta.Indicador = false;
-                    respuesta.Mensaje = "No se ha podido actualizar el estado del usuario.";
+                    respuesta.Mensaje = "No se ha encontrado el correo en la base de datos.";
                 }
 
-                if (System.IO.File.Exists(rutaPlantilla))
-                {
-                    if (string.IsNullOrEmpty(contenidoHtml))
-                    {
-                        contenidoHtml = System.IO.File.ReadAllText(rutaPlantilla);
-                    }
-
-                    contenidoHtml = contenidoHtml
-                        .Replace("@@NOMBRE_USUARIO", result!.NombreUsuario)
-                        .Replace("@@FECHA_GENERACION", DateTime.Now.ToString("dd/MM/yyyy HH:mm"))
-                        .Replace("@@ESTADO_NUEVO", nombreEstado);
-
-                    string mensajeExtra = string.IsNullOrEmpty(mensaje) ? "" : mensaje;
-                    contenidoHtml = contenidoHtml.Replace("@@MENSAJE_EXTRA", mensajeExtra);
-
-                    _general.EnviarCorreo(model.Correo!, "Actualización de Acceso", contenidoHtml);
-                }
 
                 return Ok(respuesta);
             }

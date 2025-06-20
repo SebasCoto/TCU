@@ -3,8 +3,9 @@ import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useLoginStore } from '@/stores/Login/LoginStore'
 
-const router = useRouter() // Aquí se usa dentro de setup
+const router = useRouter()
 const route = useRoute()
+
 const usuario = ref({
   username: '',
   password: '',

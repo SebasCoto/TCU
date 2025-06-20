@@ -130,7 +130,7 @@ namespace TCUApi.Controllers
                             .Replace("@@NOMBRE_USUARIO", datos!.NombreUsuario)
                             .Replace("@@FECHA_GENERACION", DateTime.Now.ToString("dd/MM/yyyy HH:mm"));
 
-                        _general.EnviarCorreo(model.Correo!, "Codigo de acceso", contenidoHtml);
+                        _general.EnviarCorreo(model.Correo!, "Usuario en espera", contenidoHtml);
 
                         respuesta.Indicador = true;
                         respuesta.Mensaje = "Correo enviado correctamente";

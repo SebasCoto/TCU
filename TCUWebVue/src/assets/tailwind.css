@@ -1,3 +1,25 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import './primevue/tailwind.css';
+@import 'tailwindcss/utilities';
+
+/* Transiciones suaves */
+.p-inputtext {
+  transition: all 0.3s ease-in-out;
+}
+.p-inputtext:focus {
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+}
+
+/* Hover en tabla */
+.p-datatable .p-column-title {
+  transition: color 0.3s ease-in-out;
+}
+.p-datatable .p-column-title:hover {
+  color: #2563eb;
+}
+
+/* Bordes redondeados */
+.container {
+  border-radius: 12px;
+}

@@ -5,8 +5,7 @@
     <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
       <!-- Filtro por nombre -->
       <div class="relative w-full sm:w-1/2">
-        <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
-          <!-- Ícono de lupa -->
+        <span class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -26,16 +25,16 @@
           v-model="filtroNombre"
           type="text"
           placeholder="Buscar por nombre..."
-          class="border border-gray-300 pl-10 pr-4 py-2 rounded w-full focus:ring-2 focus:ring-blue-400"
+          class="border border-gray-300 pl-10 pr-4 py-3 rounded-lg w-full focus:ring-2 focus:ring-blue-400 transition-all duration-300 ease-in-out transform hover:scale-105"
         />
       </div>
 
       <!-- Filtro por rol -->
       <div class="relative w-full sm:w-1/3">
-        <span class="absolute top-1/2 transform -translate-y-1/2 text-gray-400"> </span>
+        <span class="absolute top-1/2 transform -translate-y-1/2 text-gray-400"></span>
         <select
           v-model="filtroRol"
-          class="border border-gray-300 pl-10 pr-4 py-2 rounded w-full focus:ring-2"
+          class="w-full p-3 border border-gray-300 rounded-lg text-sm font-semibold transition duration-300 ease-in-out focus:ring-2 focus:ring-blue-400 hover:scale-105"
         >
           <option value="">Todos los roles</option>
           <option v-for="rol in roles" :key="rol.id" :value="rol.nombre">
@@ -52,21 +51,21 @@
       <p>No hay usuarios disponibles.</p>
     </div>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
       <div
         v-for="voluntario in voluntarios"
         :key="voluntario.id"
-        class="rounded-xl overflow-hidden shadow-md hover:shadow-xl transition duration-300 bg-white"
+        class="rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 ease-in-out bg-white w-full border border-gray-200"
       >
         <div class="px-6 py-4">
-          <p class="font-bold text-lg text-indigo-700 mb-2">
-            {{ voluntario.nombre }} {{ voluntario.apellidos }}
+          <p class="font-semibold text-xl text-indigo-700 mb-2">
+            {{ voluntario.nombre }} {{ voluntario.apellido }}
           </p>
           <ul class="text-gray-600 text-sm space-y-1">
             <li><strong>Correo:</strong> {{ voluntario.correo }}</li>
+            <li><strong>Nombre de usuario:</strong> {{ voluntario.username }}</li>
             <li><strong>Rol:</strong> {{ voluntario.nombreRol }}</li>
           </ul>
-
           <!-- Botones de acción -->
           <div class="flex justify-end space-x-2 mt-4">
             <!-- Botón Editar -->
@@ -126,7 +125,6 @@
     </div>
   </div>
 </template>
-
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import { ObtenerVoluntarios, EliminarUsuario } from '@/services/Usuarios/UsuariosService'
@@ -174,6 +172,7 @@ const obtenerVoluntarios = async () => {
     correo: v.Correo,
     Idrol: v.Id_Rol,
     nombreRol: v.NombreRol,
+    username: v.Username,
   }))
 }
 
@@ -186,6 +185,7 @@ const deleteUser = async (id) => {
     confirmButtonColor: '#3085d6',
     cancelButtonColor: '#d33',
     confirmButtonText: 'Sí, Eliminar!',
+    cancelButtonText: 'Cancelar',
   }).then(async (result) => {
     if (result.isConfirmed) {
       try {
@@ -221,3 +221,14 @@ onMounted(() => {
   cargarRoles()
 })
 </script>
+<style scoped>
+button {
+  transition:
+    transform 0.3s ease,
+    background-color 0.3s ease;
+}
+
+button:hover {
+  transform: scale(1.05);
+}
+</style>

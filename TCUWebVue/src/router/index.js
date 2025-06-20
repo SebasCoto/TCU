@@ -5,6 +5,10 @@ import { useLoginStore } from '@/stores/Login/LoginStore'
 
 const routes = [
   {
+    path: '/',
+    redirect: '/login',
+  },
+  {
     path: '/login',
     name: 'login',
     component: () => import('@/views/Login/Login.vue'),

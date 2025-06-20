@@ -1,6 +1,6 @@
 USE [master]
 GO
-/****** Object:  Database [AbrazosDB]    Script Date: 03/05/2025 04:53:01 p. m. ******/
+/****** Object:  Database [AbrazosDB]    Script Date: 20/06/2025 10:07:40 a. m. ******/
 CREATE DATABASE [AbrazosDB]
  CONTAINMENT = NONE
  ON  PRIMARY 
@@ -84,7 +84,7 @@ ALTER DATABASE [AbrazosDB] SET QUERY_STORE (OPERATION_MODE = READ_WRITE, CLEANUP
 GO
 USE [AbrazosDB]
 GO
-/****** Object:  Table [dbo].[ArchivosUser]    Script Date: 03/05/2025 04:53:02 p. m. ******/
+/****** Object:  Table [dbo].[ArchivosUser]    Script Date: 20/06/2025 10:07:40 a. m. ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -101,7 +101,7 @@ CREATE TABLE [dbo].[ArchivosUser](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[categoria]    Script Date: 03/05/2025 04:53:02 p. m. ******/
+/****** Object:  Table [dbo].[categoria]    Script Date: 20/06/2025 10:07:40 a. m. ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -116,7 +116,7 @@ PRIMARY KEY CLUSTERED
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[EstadoRegistro]    Script Date: 03/05/2025 04:53:02 p. m. ******/
+/****** Object:  Table [dbo].[EstadoRegistro]    Script Date: 20/06/2025 10:07:40 a. m. ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -130,7 +130,7 @@ CREATE TABLE [dbo].[EstadoRegistro](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[Eventos]    Script Date: 03/05/2025 04:53:02 p. m. ******/
+/****** Object:  Table [dbo].[Eventos]    Script Date: 20/06/2025 10:07:40 a. m. ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -149,7 +149,7 @@ CREATE TABLE [dbo].[Eventos](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[Expedientes]    Script Date: 03/05/2025 04:53:02 p. m. ******/
+/****** Object:  Table [dbo].[Expedientes]    Script Date: 20/06/2025 10:07:40 a. m. ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -167,7 +167,7 @@ CREATE TABLE [dbo].[Expedientes](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[familias]    Script Date: 03/05/2025 04:53:02 p. m. ******/
+/****** Object:  Table [dbo].[familias]    Script Date: 20/06/2025 10:07:40 a. m. ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -188,7 +188,7 @@ CREATE TABLE [dbo].[familias](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[inventario]    Script Date: 03/05/2025 04:53:02 p. m. ******/
+/****** Object:  Table [dbo].[inventario]    Script Date: 20/06/2025 10:07:40 a. m. ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -204,7 +204,7 @@ PRIMARY KEY CLUSTERED
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[presupuestos]    Script Date: 03/05/2025 04:53:02 p. m. ******/
+/****** Object:  Table [dbo].[presupuestos]    Script Date: 20/06/2025 10:07:40 a. m. ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -220,7 +220,7 @@ CREATE TABLE [dbo].[presupuestos](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[rol]    Script Date: 03/05/2025 04:53:02 p. m. ******/
+/****** Object:  Table [dbo].[rol]    Script Date: 20/06/2025 10:07:40 a. m. ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -234,7 +234,7 @@ PRIMARY KEY CLUSTERED
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[usuarios]    Script Date: 03/05/2025 04:53:02 p. m. ******/
+/****** Object:  Table [dbo].[usuarios]    Script Date: 20/06/2025 10:07:40 a. m. ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -259,7 +259,7 @@ CREATE TABLE [dbo].[usuarios](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[voluntarios]    Script Date: 03/05/2025 04:53:02 p. m. ******/
+/****** Object:  Table [dbo].[voluntarios]    Script Date: 20/06/2025 10:07:40 a. m. ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -275,7 +275,7 @@ CREATE TABLE [dbo].[voluntarios](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[vulnerabilidad]    Script Date: 03/05/2025 04:53:02 p. m. ******/
+/****** Object:  Table [dbo].[vulnerabilidad]    Script Date: 20/06/2025 10:07:40 a. m. ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -309,7 +309,7 @@ REFERENCES [dbo].[usuarios] ([id_usuario])
 GO
 ALTER TABLE [dbo].[voluntarios] CHECK CONSTRAINT [FK_VOLUNTARIOS_USUARIOS]
 GO
-/****** Object:  StoredProcedure [dbo].[AccesoUsuarios]    Script Date: 03/05/2025 04:53:02 p. m. ******/
+/****** Object:  StoredProcedure [dbo].[AccesoUsuarios]    Script Date: 20/06/2025 10:07:40 a. m. ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -338,7 +338,7 @@ BEGIN
     WHERE Id_EstadoRegistro = @Id_EstadoRegistro;
 END
 GO
-/****** Object:  StoredProcedure [dbo].[ActualizarContrasenna]    Script Date: 03/05/2025 04:53:02 p. m. ******/
+/****** Object:  StoredProcedure [dbo].[ActualizarContrasenna]    Script Date: 20/06/2025 10:07:40 a. m. ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -370,7 +370,7 @@ BEGIN
     END
 END
 GO
-/****** Object:  StoredProcedure [dbo].[ActualizarEvento]    Script Date: 03/05/2025 04:53:02 p. m. ******/
+/****** Object:  StoredProcedure [dbo].[ActualizarEvento]    Script Date: 20/06/2025 10:07:40 a. m. ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -390,7 +390,7 @@ BEGIN
 
 END
 GO
-/****** Object:  StoredProcedure [dbo].[ActualizarFamilia]    Script Date: 03/05/2025 04:53:02 p. m. ******/
+/****** Object:  StoredProcedure [dbo].[ActualizarFamilia]    Script Date: 20/06/2025 10:07:40 a. m. ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -432,34 +432,36 @@ BEGIN
     END
 END
 GO
-/****** Object:  StoredProcedure [dbo].[ActualizarProducto]    Script Date: 03/05/2025 04:53:02 p. m. ******/
+/****** Object:  StoredProcedure [dbo].[ActualizarProducto]    Script Date: 20/06/2025 10:07:40 a. m. ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-
 CREATE PROCEDURE [dbo].[ActualizarProducto]
 	@Id_Inventario INT,
-	@NombreProducto nvarchar(100),
-	@Id_Categoria INT ,
+	@NombreProducto NVARCHAR(100),
+	@Id_Categoria INT,
     @stock INT
 AS
 BEGIN
 
+    -- Verifica si existe otro producto con el mismo nombre y que no sea el mismo producto
     IF EXISTS(SELECT 1 FROM dbo.inventario 
-              WHERE @NombreProducto = nombre)
+              WHERE nombre = @NombreProducto AND id_inventario != @Id_Inventario)
     BEGIN
         RAISERROR('El producto ya existe.', 16, 1);
     END
     ELSE
     BEGIN
-        UPDATE dbo.inventario SET nombre = @NombreProducto, id_categoria = @Id_Categoria, stock =@stock
+        -- Actualiza el producto
+        UPDATE dbo.inventario 
+        SET nombre = @NombreProducto, id_categoria = @Id_Categoria, stock = @stock
 		WHERE id_inventario = @Id_Inventario
     END
 
 END
 GO
-/****** Object:  StoredProcedure [dbo].[ActualizarUsuario]    Script Date: 03/05/2025 04:53:02 p. m. ******/
+/****** Object:  StoredProcedure [dbo].[ActualizarUsuario]    Script Date: 20/06/2025 10:07:40 a. m. ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -508,7 +510,7 @@ BEGIN
     END
 END
 GO
-/****** Object:  StoredProcedure [dbo].[CalcularPresupuesto]    Script Date: 03/05/2025 04:53:02 p. m. ******/
+/****** Object:  StoredProcedure [dbo].[CalcularPresupuesto]    Script Date: 20/06/2025 10:07:40 a. m. ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -556,7 +558,7 @@ BEGIN
     PRINT 'Presupuesto calculado y actualizado proporcionalmente.';
 END;
 GO
-/****** Object:  StoredProcedure [dbo].[DescargarArchivo]    Script Date: 03/05/2025 04:53:02 p. m. ******/
+/****** Object:  StoredProcedure [dbo].[DescargarArchivo]    Script Date: 20/06/2025 10:07:40 a. m. ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -574,7 +576,7 @@ BEGIN
 	WHERE Id_Archivo = @Id_Archivo
 END
 GO
-/****** Object:  StoredProcedure [dbo].[EliminarEvento]    Script Date: 03/05/2025 04:53:02 p. m. ******/
+/****** Object:  StoredProcedure [dbo].[EliminarEvento]    Script Date: 20/06/2025 10:07:40 a. m. ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -590,7 +592,7 @@ BEGIN
 
 END
 GO
-/****** Object:  StoredProcedure [dbo].[EliminarFamilia]    Script Date: 03/05/2025 04:53:02 p. m. ******/
+/****** Object:  StoredProcedure [dbo].[EliminarFamilia]    Script Date: 20/06/2025 10:07:40 a. m. ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -606,7 +608,7 @@ BEGIN
 
 END
 GO
-/****** Object:  StoredProcedure [dbo].[EliminarProducto]    Script Date: 03/05/2025 04:53:02 p. m. ******/
+/****** Object:  StoredProcedure [dbo].[EliminarProducto]    Script Date: 20/06/2025 10:07:40 a. m. ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -622,7 +624,7 @@ BEGIN
 
 END
 GO
-/****** Object:  StoredProcedure [dbo].[EliminarUsuario]    Script Date: 03/05/2025 04:53:02 p. m. ******/
+/****** Object:  StoredProcedure [dbo].[EliminarUsuario]    Script Date: 20/06/2025 10:07:40 a. m. ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -638,7 +640,7 @@ BEGIN
 
 END
 GO
-/****** Object:  StoredProcedure [dbo].[IniciarSesion]    Script Date: 03/05/2025 04:53:02 p. m. ******/
+/****** Object:  StoredProcedure [dbo].[IniciarSesion]    Script Date: 20/06/2025 10:07:40 a. m. ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -665,7 +667,7 @@ BEGIN
 
 END
 GO
-/****** Object:  StoredProcedure [dbo].[MostrarEventos]    Script Date: 03/05/2025 04:53:02 p. m. ******/
+/****** Object:  StoredProcedure [dbo].[MostrarEventos]    Script Date: 20/06/2025 10:07:40 a. m. ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -686,7 +688,25 @@ BEGIN
 
 END
 GO
-/****** Object:  StoredProcedure [dbo].[ObtenerCorreoById]    Script Date: 03/05/2025 04:53:02 p. m. ******/
+/****** Object:  StoredProcedure [dbo].[ObtenerCategorias]    Script Date: 20/06/2025 10:07:40 a. m. ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE PROCEDURE [dbo].[ObtenerCategorias]
+AS
+BEGIN
+
+	
+
+	SELECT id_categoria, nombre
+	FROM categoria
+
+
+END
+GO
+/****** Object:  StoredProcedure [dbo].[ObtenerCorreoById]    Script Date: 20/06/2025 10:07:40 a. m. ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -701,7 +721,7 @@ BEGIN
 	WHERE id_usuario = @Id_usuario
 END
 GO
-/****** Object:  StoredProcedure [dbo].[ObtenerCorreosSeleccionados]    Script Date: 03/05/2025 04:53:02 p. m. ******/
+/****** Object:  StoredProcedure [dbo].[ObtenerCorreosSeleccionados]    Script Date: 20/06/2025 10:07:40 a. m. ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -717,7 +737,7 @@ BEGIN
       AND (@Filtro IS NULL OR nombre LIKE '%' + @Filtro + '%')
 END
 GO
-/****** Object:  StoredProcedure [dbo].[ObtenerEstados]    Script Date: 03/05/2025 04:53:02 p. m. ******/
+/****** Object:  StoredProcedure [dbo].[ObtenerEstados]    Script Date: 20/06/2025 10:07:40 a. m. ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -735,7 +755,7 @@ BEGIN
 
 END
 GO
-/****** Object:  StoredProcedure [dbo].[ObtenerExpedientes]    Script Date: 03/05/2025 04:53:02 p. m. ******/
+/****** Object:  StoredProcedure [dbo].[ObtenerExpedientes]    Script Date: 20/06/2025 10:07:40 a. m. ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -766,7 +786,7 @@ BEGIN
 	END
 END
 GO
-/****** Object:  StoredProcedure [dbo].[ObtenerFamilias]    Script Date: 03/05/2025 04:53:02 p. m. ******/
+/****** Object:  StoredProcedure [dbo].[ObtenerFamilias]    Script Date: 20/06/2025 10:07:40 a. m. ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -788,14 +808,16 @@ BEGIN
 			F.cantidad_familiares,
 			F.cantidad_ninos,
 			F.presupuesto,
-			V.nombre 'Nombre_Vulnerabilidad'
+			F.id_vulnerabilidad,
+			V.nombre 'Nombre_Vulnerabilidad',
+			F.presupuesto
 	FROM	dbo.familias F
 	INNER	JOIN dbo.vulnerabilidad V ON F.id_vulnerabilidad = V.id_vulnerabilidad
 	WHERE  id_familia= ISNULL(@Id_Familia,id_familia)
 
 END
 GO
-/****** Object:  StoredProcedure [dbo].[ObtenerProductos]    Script Date: 03/05/2025 04:53:02 p. m. ******/
+/****** Object:  StoredProcedure [dbo].[ObtenerProductos]    Script Date: 20/06/2025 10:07:40 a. m. ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -821,7 +843,7 @@ BEGIN
 
 END
 GO
-/****** Object:  StoredProcedure [dbo].[ObtenerRoles]    Script Date: 03/05/2025 04:53:02 p. m. ******/
+/****** Object:  StoredProcedure [dbo].[ObtenerRoles]    Script Date: 20/06/2025 10:07:40 a. m. ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -839,7 +861,7 @@ BEGIN
 
 END
 GO
-/****** Object:  StoredProcedure [dbo].[ObtenerUsuarios]    Script Date: 03/05/2025 04:53:02 p. m. ******/
+/****** Object:  StoredProcedure [dbo].[ObtenerUsuarios]    Script Date: 20/06/2025 10:07:40 a. m. ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -869,7 +891,7 @@ BEGIN
 
 END
 GO
-/****** Object:  StoredProcedure [dbo].[ObtenerUsuariosEspera]    Script Date: 03/05/2025 04:53:02 p. m. ******/
+/****** Object:  StoredProcedure [dbo].[ObtenerUsuariosEspera]    Script Date: 20/06/2025 10:07:40 a. m. ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -900,7 +922,7 @@ BEGIN
 
 END
 GO
-/****** Object:  StoredProcedure [dbo].[ObtenerVoluntarios]    Script Date: 03/05/2025 04:53:02 p. m. ******/
+/****** Object:  StoredProcedure [dbo].[ObtenerVoluntarios]    Script Date: 20/06/2025 10:07:40 a. m. ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -931,7 +953,25 @@ BEGIN
 
 END
 GO
-/****** Object:  StoredProcedure [dbo].[RecuperarContrasenna]    Script Date: 03/05/2025 04:53:02 p. m. ******/
+/****** Object:  StoredProcedure [dbo].[ObtenerVulnerabilidad]    Script Date: 20/06/2025 10:07:40 a. m. ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE PROCEDURE [dbo].[ObtenerVulnerabilidad]
+AS
+BEGIN
+
+	
+
+	SELECT id_vulnerabilidad,nombre
+	FROM vulnerabilidad
+
+
+END
+GO
+/****** Object:  StoredProcedure [dbo].[RecuperarContrasenna]    Script Date: 20/06/2025 10:07:40 a. m. ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -952,7 +992,7 @@ BEGIN
 
 END
 GO
-/****** Object:  StoredProcedure [dbo].[RegistrarArchivo]    Script Date: 03/05/2025 04:53:02 p. m. ******/
+/****** Object:  StoredProcedure [dbo].[RegistrarArchivo]    Script Date: 20/06/2025 10:07:40 a. m. ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -981,7 +1021,7 @@ BEGIN
 
 END
 GO
-/****** Object:  StoredProcedure [dbo].[RegistrarEvento]    Script Date: 03/05/2025 04:53:02 p. m. ******/
+/****** Object:  StoredProcedure [dbo].[RegistrarEvento]    Script Date: 20/06/2025 10:07:40 a. m. ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -999,7 +1039,7 @@ BEGIN
     VALUES (@Nombre_Evento, @Descripcion, @Fecha_Inicio, @Fecha_Final, @Color, @invitados)
 END
 GO
-/****** Object:  StoredProcedure [dbo].[RegistrarFamilia]    Script Date: 03/05/2025 04:53:02 p. m. ******/
+/****** Object:  StoredProcedure [dbo].[RegistrarFamilia]    Script Date: 20/06/2025 10:07:40 a. m. ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1030,7 +1070,7 @@ BEGIN
 
 END
 GO
-/****** Object:  StoredProcedure [dbo].[RegistrarProducto]    Script Date: 03/05/2025 04:53:02 p. m. ******/
+/****** Object:  StoredProcedure [dbo].[RegistrarProducto]    Script Date: 20/06/2025 10:07:40 a. m. ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1044,7 +1084,7 @@ AS
 BEGIN
 
     IF EXISTS(SELECT 1 FROM dbo.inventario 
-              WHERE @NombreProducto = @NombreProducto)
+              WHERE nombre = @NombreProducto)
     BEGIN
         RAISERROR('Este producto ya esta registrado.', 16, 1);
     END
@@ -1056,7 +1096,7 @@ BEGIN
 
 END
 GO
-/****** Object:  StoredProcedure [dbo].[RegistrarUsuario]    Script Date: 03/05/2025 04:53:02 p. m. ******/
+/****** Object:  StoredProcedure [dbo].[RegistrarUsuario]    Script Date: 20/06/2025 10:07:40 a. m. ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1086,7 +1126,7 @@ BEGIN
 
 END
 GO
-/****** Object:  StoredProcedure [dbo].[VerificarCorreo]    Script Date: 03/05/2025 04:53:02 p. m. ******/
+/****** Object:  StoredProcedure [dbo].[VerificarCorreo]    Script Date: 20/06/2025 10:07:40 a. m. ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1102,12 +1142,39 @@ BEGIN
 			apellidos,
 			r.nombre as 'NombreRol',
 			Correo,
+			Cedula,
 			username,
 			E.Nombre 'NombreEstadoRegistro'
 	FROM	dbo.EstadoRegistro E
 	JOIN dbo.usuarios U ON E.Id_EstadoRegistro = U.Id_EstadoRegistro
 	JOIN dbo.rol r  ON U.id_rol = r.id_rol
 	WHERE   correo = @Correo
+
+END
+GO
+/****** Object:  StoredProcedure [dbo].[VerificarIsVoluntario]    Script Date: 20/06/2025 10:07:40 a. m. ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE PROCEDURE [dbo].[VerificarIsVoluntario]
+	@Cedula nvarchar(100)
+AS
+BEGIN
+	
+	SELECT	U.id_usuario,
+			U.Nombre 'NombreUsuario',
+			apellidos,
+			r.nombre as 'NombreRol',
+			Correo,
+			U.Cedula
+			username,
+			E.Nombre 'NombreEstadoRegistro'
+	FROM	dbo.EstadoRegistro E
+	JOIN dbo.usuarios U ON E.Id_EstadoRegistro = U.Id_EstadoRegistro
+	JOIN dbo.rol r  ON U.id_rol = r.id_rol
+	WHERE   Cedula = @Cedula
 
 END
 GO

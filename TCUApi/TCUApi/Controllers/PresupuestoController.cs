@@ -12,13 +12,13 @@ namespace TCUApi.Controllers
     [Authorize]
     [Route("api/[controller]")]
     [ApiController]
-    public class PrespuestoController : ControllerBase
+    public class PresupuestoController : ControllerBase
     {
         private readonly IConfiguration _configuration;
         private readonly IGeneral _general;
         private readonly IHttpClientFactory _httpClientFactory;
 
-        public PrespuestoController(IConfiguration configuration, IGeneral general, IHttpClientFactory httpClient)
+        public PresupuestoController(IConfiguration configuration, IGeneral general, IHttpClientFactory httpClient)
         {
             _configuration = configuration;
             _general = general;
@@ -27,15 +27,22 @@ namespace TCUApi.Controllers
 
         #region prespuesto
 
+
+
         [HttpPost]
         [Route("RegistrarPresupuesto")]
-        public IActionResult RegistrarPresupuesto(FamiliasModel model, decimal MontoTotal)
+        public IActionResult RegistrarPresupuesto( decimal MontoTotal)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(new { error = "Datos del modelo no válidos", detalle = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList() });
             }
 
+            if(MontoTotal == 0)
+            {
+                return BadRequest(new {Indicador= false, Mensaje = "El monto no puede ser 0" });
+
+            }
             try
             {
                 if (!_general.EsAdministrador(User.Claims))

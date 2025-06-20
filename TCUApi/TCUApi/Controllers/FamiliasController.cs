@@ -35,33 +35,25 @@ namespace TCUApi.Controllers
             {
                 RespuestaModel respuesta = new RespuestaModel();
 
-                var client = _httpClientFactory.CreateClient();
-                string apiUrl = $"https://apis.gometa.org/cedulas/{model.cedula_representante}";
-
-                HttpResponseMessage response = await client.GetAsync(apiUrl);
-                if (!response.IsSuccessStatusCode)
-                {
-                    return BadRequest(new { mensaje = "Error al consultar la API externa" });
-                }
-
-                string apiResponse = await response.Content.ReadAsStringAsync();
-                var datosCedula = JsonConvert.DeserializeObject<Dictionary<string, object>>(apiResponse);
-
-                if (datosCedula == null || !datosCedula.ContainsKey("nombre"))
-                {
-                    return BadRequest(new { mensaje = "No se encontraron datos para esta cédula" });
-                }
-
-                string nombreRepresentante = datosCedula["nombre"].ToString()!;
+               
 
                 using (var connection = new SqlConnection(_configuration.GetSection("ConnectionStrings:AbrazosDBConnection").Value))
                 {
                     await connection.OpenAsync();
 
+                    var isVoluntario = await connection.QueryAsync("VerificarIsVoluntario",new { Cedula =model.cedula_representante },commandType: CommandType.StoredProcedure);
+
+                    if(isVoluntario.Any())
+                    {
+                        return BadRequest(new { Indicador =false , Mensaje = "El usuario es un voluntario por lo que no se puede registrara como representante" });
+
+                    }
+
+
                     var result = await connection.ExecuteAsync("RegistrarFamilia", new
                     {
                         model.cedula_representante,
-                        Nombre_Representante = nombreRepresentante,
+                        model.Nombre_Representante,
                         model.direccion,
                         model.telefono,
                         model.cantidad_familiares,
@@ -77,7 +69,7 @@ namespace TCUApi.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { mensaje = ex.Message });
+                return BadRequest(new { Mensaje = ex.Message });
             }
         }
 
@@ -94,31 +86,14 @@ namespace TCUApi.Controllers
                 }
                 RespuestaModel respuesta = new RespuestaModel();
 
-                var client = _httpClientFactory.CreateClient();
-                string apiUrl = $"https://apis.gometa.org/cedulas/{model.cedula_representante}";
-
-                HttpResponseMessage response = await client.GetAsync(apiUrl);
-                if (!response.IsSuccessStatusCode)
-                {
-                    return BadRequest(new { mensaje = "Error al consultar la API externa" });
-                }
-
-                string apiResponse = await response.Content.ReadAsStringAsync();
-                var datosCedula = JsonConvert.DeserializeObject<Dictionary<string, object>>(apiResponse);
-
-                if (datosCedula == null || !datosCedula.ContainsKey("nombre"))
-                {
-                    return BadRequest(new { mensaje = "No se encontraron datos para esta cédula" });
-                }
-
-                string nombreRepresentante = datosCedula["nombre"].ToString()!;
+               
 
                 using (var connection = new SqlConnection(_configuration.GetSection("ConnectionStrings:AbrazosDBConnection").Value))
                 {
                     var result = connection.Execute("ActualizarFamilia", new
                     {
                         model.Id_Familia,
-                        Nombre_Representante = nombreRepresentante,
+                        model.Nombre_Representante,
                         model.cedula_representante,
                         model.direccion,
                         model.telefono,
@@ -145,7 +120,7 @@ namespace TCUApi.Controllers
 
         [HttpDelete]
         [Route("EliminarFamilia")]
-        public IActionResult EliminarFamilia([FromBody] FamiliasModel model)
+        public IActionResult EliminarFamilia(int id)
         {
             try
             {
@@ -156,7 +131,7 @@ namespace TCUApi.Controllers
 
                 using (var context = new SqlConnection(_configuration.GetConnectionString("AbrazosDBConnection")))
                 {
-                    var result = context.Execute("EliminarFamilia", new { model.Id_Familia });
+                    var result = context.Execute("EliminarFamilia", new { Id_Familia = id });
 
                     return Ok(new RespuestaModel
                     {
@@ -203,10 +178,66 @@ namespace TCUApi.Controllers
 
         }
 
+        [HttpGet]
+        [Route("ObtenerFamiliaById")]
+        public IActionResult ObtenerUsuarioById(long id)
+        {
+            try
+            {
+
+                using (var connection = new SqlConnection(_configuration.GetConnectionString("AbrazosDBConnection")))
+                {
+                    var result = connection.Query<FamiliasModel>("ObtenerFamilias", new { Id_Familia = id }, commandType: CommandType.StoredProcedure).ToList();
+                    return Ok(new RespuestaModel { Indicador = true, Datos = result });
+                }
+            }
+            catch (SqlException sqlEx)
+            {
+                return StatusCode(500, new { error = "Error en la base de datos", detalle = sqlEx.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = "Error en el servidor", detalle = ex.Message });
+            }
+
+
+        }
+
+        [HttpGet]
+        [Route("ObtenerVulnerabilidad")]
+        public IActionResult ObtenerVulnerabilidad()
+        {
+            try
+            {
+
+                using (var connection = new SqlConnection(_configuration.GetConnectionString("AbrazosDBConnection")))
+                {
+                    var result = connection.Query<VulnerabilidadModel>("ObtenerVulnerabilidad", commandType: CommandType.StoredProcedure).ToList();
+
+                    var vulnerabilidades = result.Select(vulnerabilidad => new
+                    {
+                        id = vulnerabilidad.id_vulnerabilidad,
+                        text = vulnerabilidad.nombre
+                    }).ToList();
+
+                    return Ok(new RespuestaModel { Indicador = true, Datos = result });
+                }
+            }
+            catch (SqlException sqlEx)
+            {
+                return StatusCode(500, new { error = "Error en la base de datos", detalle = sqlEx.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = "Error en el servidor", detalle = ex.Message });
+            }
+
+        }
+
         #endregion
 
 
 
-        
+
     }
 }

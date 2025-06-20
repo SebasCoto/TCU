@@ -5,8 +5,7 @@
     <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
       <!-- Filtro por nombre -->
       <div class="relative w-full sm:w-1/2">
-        <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
-          <!-- Ícono de lupa -->
+        <span class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -26,37 +25,44 @@
           v-model="filtroNombre"
           type="text"
           placeholder="Buscar por nombre..."
-          class="border border-gray-300 pl-10 pr-4 py-2 rounded w-full focus:ring-2 focus:ring-blue-400"
+          class="border border-gray-300 pl-10 pr-4 py-3 rounded-lg w-full focus:ring-2 focus:ring-blue-400 transition-all duration-300 ease-in-out transform hover:scale-105"
         />
+      </div>
+
+      <!-- Filtro por rol -->
+      <div class="relative w-full sm:w-1/3">
+        <select
+          v-model="filtroRol"
+          class="w-full p-3 border border-gray-300 rounded-lg text-sm font-semibold transition duration-300 ease-in-out focus:ring-2 focus:ring-blue-400 hover:scale-105"
+        >
+          <option value="">Todos los roles</option>
+          <option v-for="rol in roles" :key="rol.id" :value="rol.nombre">
+            {{ rol.nombre }}
+          </option>
+        </select>
       </div>
     </div>
 
-    <div
-      v-if="!listaEspera.length || !usuariosEspera.length"
-      class="text-center text-gray-600 py-6"
-    >
+    <div v-if="usuariosFiltrados.length === 0" class="text-center text-gray-600 py-6">
       <p>No hay solicitudes pendientes.</p>
     </div>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
       <div
-        v-for="voluntario in usuariosEspera"
-        :key="voluntario.id"
-        class="rounded-xl overflow-hidden shadow-md hover:shadow-xl transition duration-300 bg-white"
+        v-for="usuario in usuariosFiltrados"
+        :key="usuario.id"
+        class="rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 ease-in-out bg-white w-full border border-gray-200"
       >
         <div class="px-6 py-4">
-          <p class="font-bold text-lg text-indigo-700 mb-2">
-            {{ voluntario.nombre }} {{ voluntario.apellidos }}
+          <p class="font-semibold text-xl text-indigo-700 mb-2">
+            {{ usuario.nombre }} {{ usuario.apellido }}
           </p>
           <ul class="text-gray-600 text-sm space-y-1">
-            <li><strong>Correo:</strong> {{ voluntario.correo }}</li>
-            <li><strong>Rol:</strong> {{ voluntario.nombreRol }}</li>
-            <li><strong>Estado:</strong> {{ voluntario.nombreEstado }}</li>
+            <li><strong>Correo:</strong> {{ usuario.correo }}</li>
           </ul>
-
           <div class="flex justify-end space-x-2 mt-4">
             <button
-              @click="abrirModal(voluntario.correo, voluntario.id)"
+              @click="abrirModal(usuario.correo, usuario.id)"
               class="flex items-center gap-1 bg-green-400 hover:bg-green-600 text-white px-3 py-1 rounded text-sm transition"
             >
               <svg
@@ -94,19 +100,41 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import { ObtenerUsuariosEspera } from '@/services/UsuariosEspera/UsuariosEsperaService'
+import { obtenerRoles } from '@/services/perfil/perfilServices'
+
 const filtroNombre = ref('')
 const listaEspera = ref([])
 const modalEditarAccesoVisible = ref(false)
 import modalAccesoUsuarios from '@/components/UsuariosEspera/modalAccesoUsuarios.vue'
 const correoSeleccionado = ref('')
 const idUsuario = ref(0)
+const roles = ref([])
+const filtroRol = ref('')
 
-const usuariosEspera = computed(() =>
+const loading = ref(false)
+
+const cargarRoles = async () => {
+  loading.value = true
+  try {
+    const resultados = await obtenerRoles()
+    roles.value = resultados.map((rol) => ({
+      id: rol.id_rol,
+      nombre: rol.nombre,
+    }))
+  } catch (error) {
+    console.error('Error al cargar roles:', error)
+  } finally {
+    loading.value = false
+  }
+}
+
+const usuariosFiltrados = computed(() =>
   listaEspera.value.filter((v) => {
     const coincideNombre =
       v.nombre.toLowerCase().includes(filtroNombre.value.toLowerCase()) ||
       v.apellidos.toLowerCase().includes(filtroNombre.value.toLowerCase())
-    return coincideNombre
+    const coincideRol = !filtroRol.value || v.nombreRol === filtroRol.value
+    return coincideNombre && coincideRol
   }),
 )
 
@@ -130,5 +158,16 @@ const abrirModal = (correo, id) => {
 }
 onMounted(() => {
   obtenerUsuariosEspera()
+  cargarRoles()
 })
 </script>
+<style scoped>
+button {
+  transition:
+    transform 0.3s ease,
+    background-color 0.3s ease;
+}
+button:hover {
+  transform: scale(1.05);
+}
+</style>
