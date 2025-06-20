@@ -2,8 +2,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
+using MySql.Data.MySqlClient;
 using System.Data;
 using System.Security.Cryptography;
 using System.Text;
@@ -36,7 +36,7 @@ namespace TCUApi.Controllers
                 return Unauthorized(new { mensaje = "No tiene permisos para realizar esta acción" });
             }
 
-            using (var context = new SqlConnection(_configuration.GetSection("ConnectionStrings:AbrazosDBConnection").Value))
+            using (var context = new MySqlConnection(_configuration.GetSection("ConnectionStrings:AbrazosDBConnection").Value))
             {
                 
 
@@ -45,10 +45,10 @@ namespace TCUApi.Controllers
                 string contenidoHtml = "";
 
                 var result = context.QueryFirstOrDefault<UsuarioModel>("VerificarCorreo",
-                    new { model.Correo });
+                    new { p_Correo = model.Correo });
 
                 var nombreEstado = context.ExecuteScalar<string>("AccesoUsuarios",
-                    new { model.Id_EstadoRegistro, model.Id_usuario }, commandType: CommandType.StoredProcedure);
+                    new { p_Id_EstadoRegistro = model.Id_EstadoRegistro, p_Id_Usuario = model.Id_usuario }, commandType: CommandType.StoredProcedure);
 
                 if (result != null)
                 {
@@ -74,7 +74,7 @@ namespace TCUApi.Controllers
                                 double.Parse(_configuration.GetSection("Variables:MinutosVigenciaTemporal").Value!));
 
                             context.Execute("RecuperarContrasenna",
-                                new { result!.Id_usuario, Contrasenna = contrasennaEncriptada, ContrasennaAnterior = contrasennaAnterior, VencimientoContraTemp = fechaVencimiento });
+                                new { p_Id_usuario = result!.Id_usuario, p_Contrasenna = contrasennaEncriptada, p_ContrasennaAnterior = contrasennaAnterior, p_VencimientoContraTemp = fechaVencimiento });
 
                             contenidoHtml = System.IO.File.ReadAllText(rutaPlantilla);
                             contenidoHtml = contenidoHtml.Replace("@@Codigo", codigo);
@@ -133,15 +133,15 @@ namespace TCUApi.Controllers
                 {
                     return Unauthorized(new { mensaje = "No tiene permisos para realizar esta acción" });
                 }
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("AbrazosDBConnection")))
+                using (var connection = new MySqlConnection(_configuration.GetConnectionString("AbrazosDBConnection")))
                 {
-                    var result = connection.Query<UsuarioModel>("ObtenerUsuariosEspera", new { Id_usuario = idUsuario }, commandType: CommandType.StoredProcedure).ToList();
+                    var result = connection.Query<UsuarioModel>("ObtenerUsuariosEspera", new { p_Id_usuario = idUsuario }, commandType: CommandType.StoredProcedure).ToList();
                     return Ok(new RespuestaModel { Indicador = true, Datos = result });
                 }
             }
-            catch (SqlException sqlEx)
+            catch (MySqlException MySqlEx)
             {
-                return StatusCode(500, new { error = "Error en la base de datos", detalle = sqlEx.Message });
+                return StatusCode(500, new { error = "Error en la base de datos", detalle = MySqlEx.Message });
             }
             catch (Exception ex)
             {
@@ -159,7 +159,7 @@ namespace TCUApi.Controllers
             try
             {
 
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("AbrazosDBConnection")))
+                using (var connection = new MySqlConnection(_configuration.GetConnectionString("AbrazosDBConnection")))
                 {
                     var result = connection.Query<EstadoModel>("ObtenerEstados", commandType: CommandType.StoredProcedure).ToList();
 
@@ -172,9 +172,9 @@ namespace TCUApi.Controllers
                     return Ok(new RespuestaModel { Indicador = true, Datos = result });
                 }
             }
-            catch (SqlException sqlEx)
+            catch (MySqlException MySqlEx)
             {
-                return StatusCode(500, new { error = "Error en la base de datos", detalle = sqlEx.Message });
+                return StatusCode(500, new { error = "Error en la base de datos", detalle = MySqlEx.Message });
             }
             catch (Exception ex)
             {

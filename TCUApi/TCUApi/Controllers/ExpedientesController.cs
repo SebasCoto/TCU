@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.SqlClient;
+using MySql.Data.MySqlClient;
 using System.Data;
 using System.Security.Cryptography;
 using System.Text;
@@ -63,8 +63,9 @@ namespace TCUApi.Controllers
                     Ruta = rutaEncriptada
                 };
 
-                using (var connection = new SqlConnection(_configuration.GetSection("ConnectionStrings:AbrazosDBConnection").Value))
+                using (var connection = new MySqlConnection(_configuration.GetSection("ConnectionStrings:AbrazosDBConnection").Value))
                 {
+                    connection.Open();
                     var result = connection.Execute("RegistrarArchivo", new
                     {
                         nuevoArchivo.Nombre,
@@ -102,8 +103,10 @@ namespace TCUApi.Controllers
             {
                 return Unauthorized(new { mensaje = "No tiene permisos para realizar esta acción" });
             }
-            using (var connection = new SqlConnection(_configuration.GetSection("ConnectionStrings:AbrazosDBConnection").Value))
+            using (var connection = new MySqlConnection(_configuration.GetSection("ConnectionStrings:AbrazosDBConnection").Value))
             {
+                connection.Open();
+
                 var archivo = connection.QueryFirstOrDefault<dynamic>("DescargarArchivo", new { Id_Archivo = id });
                 var rutaDecrypted = Decrypt(archivo!.Ruta);
 
@@ -128,15 +131,17 @@ namespace TCUApi.Controllers
                 {
                     return Unauthorized(new { mensaje = "No tiene permisos para realizar esta acción" });
                 }
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("AbrazosDBConnection")))
+                using (var connection = new MySqlConnection(_configuration.GetConnectionString("AbrazosDBConnection")))
                 {
+                    connection.Open();
+
                     var result = connection.Query<ExpedientesModel>("ObtenerExpedientes", new { Id_Expediente }, commandType: CommandType.StoredProcedure).ToList();
                     return Ok(new RespuestaModel { Indicador = true, Datos = result });
                 }
             }
-            catch (SqlException sqlEx)
+            catch (MySqlException MySqlEx)
             {
-                return StatusCode(500, new { error = "Error en la base de datos", detalle = sqlEx.Message });
+                return StatusCode(500, new { error = "Error en la base de datos", detalle = MySqlEx.Message });
             }
             catch (Exception ex)
             {

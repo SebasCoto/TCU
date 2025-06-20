@@ -65,7 +65,7 @@
         </p>
         <ul class="text-gray-600 text-sm space-y-1">
           <li><strong>Nombre representante:</strong> {{ familia.nombreRepre }}</li>
-          <li><strong>Teléfono:</strong> {{ familia.telefono }}</li>
+          <li><strong>Teléfono:</strong> {{ formatearTelefono(familia.telefono) }}</li>
           <li>
             <strong>Miembros Totales:</strong>
             {{ miembrosTotales(familia.cantFamiliares, familia.cantNinos) }}
@@ -193,7 +193,17 @@ const familiasFiltradas = computed(() => {
     return coincideNombre && coincideVulnerabilidad
   })
 })
+const formatearTelefono = (telefono) => {
+  if (!telefono) return ''
+  // Elimina cualquier caracter no numérico
+  telefono = telefono.replace(/\D/g, '')
 
+  // Verifica si el número tiene la longitud correcta (8 dígitos)
+  if (telefono.length === 8) {
+    return telefono.replace(/(\d{4})(\d{4})/, '$1-$2')
+  }
+  return telefono
+}
 onMounted(() => {
   obtenerFamilias()
   cargarVulnerabilidades()

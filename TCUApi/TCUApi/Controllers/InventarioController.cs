@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.SqlClient;
+using MySql.Data.MySqlClient;
 using Microsoft.Extensions.Configuration;
 using System.Data;
 using TCUApi.Model;
@@ -34,13 +34,13 @@ namespace TCUApi.Controllers
 
                 RespuestaModel respuesta = new RespuestaModel();
 
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("AbrazosDBConnection")))
+                using (var connection = new MySqlConnection(_configuration.GetConnectionString("AbrazosDBConnection")))
                 {
                     var result = connection.Execute("RegistrarProducto", new
                     {
-                        model.NombreProducto,
-                        model.Id_Categoria,
-                        model.stock
+                        p_NombreProducto = model.NombreProducto,
+                        p_Id_Categoria =  model.Id_Categoria,
+                        p_stock = model.stock
                     });
 
 
@@ -50,9 +50,9 @@ namespace TCUApi.Controllers
 
                 return Ok(respuesta);
             }
-            catch (SqlException sqlEx)
+            catch (MySqlException MySqlEx)
             {
-                return StatusCode(500, new { error = "Error en la base de datos", detalle = sqlEx.Message });
+                return StatusCode(500, new { error = "Error en la base de datos", detalle = MySqlEx.Message });
             }
             catch (Exception ex)
             {
@@ -68,7 +68,7 @@ namespace TCUApi.Controllers
             try
             {
 
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("AbrazosDBConnection")))
+                using (var connection = new MySqlConnection(_configuration.GetConnectionString("AbrazosDBConnection")))
                 {
                     var result = connection.Query<CategoriaModel>("ObtenerCategorias", commandType: CommandType.StoredProcedure).ToList();
 
@@ -81,9 +81,9 @@ namespace TCUApi.Controllers
                     return Ok(new RespuestaModel { Indicador = true, Datos = result });
                 }
             }
-            catch (SqlException sqlEx)
+            catch (MySqlException MySqlEx)
             {
-                return StatusCode(500, new { error = "Error en la base de datos", detalle = sqlEx.Message });
+                return StatusCode(500, new { error = "Error en la base de datos", detalle = MySqlEx.Message });
             }
             catch (Exception ex)
             {
@@ -100,14 +100,14 @@ namespace TCUApi.Controllers
             {
                 
 
-                using (var context = new SqlConnection(_configuration.GetConnectionString("AbrazosDBConnection")))
+                using (var context = new MySqlConnection(_configuration.GetConnectionString("AbrazosDBConnection")))
                 {
                     var result = context.Execute("ActualizarProducto", new
                     {
-                        model.Id_Inventario,
-                        model.NombreProducto,
-                        model.Id_Categoria,
-                        model.stock
+                        p_Id_Inventario = model.Id_Inventario,
+                        p_NombreProducto = model.NombreProducto,
+                        p_Id_Categoria = model.Id_Categoria,
+                        p_stock = model.stock
                     });
 
                     return Ok(new RespuestaModel
@@ -117,9 +117,9 @@ namespace TCUApi.Controllers
                     });
                 }
             }
-            catch (SqlException sqlEx)
+            catch (MySqlException MySqlEx)
             {
-                return StatusCode(500, new { Indicador = false, Mensaje = sqlEx.Message });
+                return StatusCode(500, new { Indicador = false, Mensaje = MySqlEx.Message });
             }
             catch (Exception ex)
             {
@@ -136,11 +136,11 @@ namespace TCUApi.Controllers
             {
                 
 
-                using (var context = new SqlConnection(_configuration.GetConnectionString("AbrazosDBConnection")))
+                using (var context = new MySqlConnection(_configuration.GetConnectionString("AbrazosDBConnection")))
                 {
                     var result = context.Execute(
                         "EliminarProducto",
-                        new { Id_Inventario = id },
+                        new { p_Id_Inventario = id },
                         commandType: CommandType.StoredProcedure
                     );
 
@@ -151,9 +151,9 @@ namespace TCUApi.Controllers
                     });
                 }
             }
-            catch (SqlException sqlEx)
+            catch (MySqlException MySqlEx)
             {
-                return StatusCode(500, new { error = "Error en la base de datos", detalle = sqlEx.Message });
+                return StatusCode(500, new { error = "Error en la base de datos", detalle = MySqlEx.Message });
             }
             catch (Exception ex)
             {
@@ -170,9 +170,9 @@ namespace TCUApi.Controllers
             {
                 
 
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("AbrazosDBConnection")))
+                using (var connection = new MySqlConnection(_configuration.GetConnectionString("AbrazosDBConnection")))
                 {
-                    var result = connection.Query<InventarioModel>("ObtenerProductos", new { Id_Inventario = 0 }, commandType: CommandType.StoredProcedure).ToList();
+                    var result = connection.Query<InventarioModel>("ObtenerProductos", new { p_Id_Inventario = 0 }, commandType: CommandType.StoredProcedure).ToList();
                     if (!result.Any())
                     {
                         return Ok(new RespuestaModel
@@ -187,9 +187,9 @@ namespace TCUApi.Controllers
 
                 }
             }
-            catch (SqlException sqlEx)
+            catch (MySqlException MySqlEx)
             {
-                return StatusCode(500, new { error = "Error en la base de datos", detalle = sqlEx.Message });
+                return StatusCode(500, new { error = "Error en la base de datos", detalle = MySqlEx.Message });
             }
             catch (Exception ex)
             {
@@ -208,9 +208,9 @@ namespace TCUApi.Controllers
             {
                 
 
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("AbrazosDBConnection")))
+                using (var connection = new MySqlConnection(_configuration.GetConnectionString("AbrazosDBConnection")))
                 {
-                    var result = connection.Query<InventarioModel>("ObtenerProductos", new { Id_Inventario = id }, commandType: CommandType.StoredProcedure).ToList();
+                    var result = connection.Query<InventarioModel>("ObtenerProductos", new { p_Id_Inventario = id }, commandType: CommandType.StoredProcedure).ToList();
                     if (!result.Any())
                     {
                         return Ok(new RespuestaModel
@@ -225,9 +225,9 @@ namespace TCUApi.Controllers
 
                 }
             }
-            catch (SqlException sqlEx)
+            catch (MySqlException MySqlEx)
             {
-                return StatusCode(500, new { error = "Error en la base de datos", detalle = sqlEx.Message });
+                return StatusCode(500, new { error = "Error en la base de datos", detalle = MySqlEx.Message });
             }
             catch (Exception ex)
             {

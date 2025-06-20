@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.SqlClient;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using System.Data;
@@ -14,6 +13,8 @@ using System.Security.Cryptography;
 using System.Text;
 using TCUApi.Model;
 using TCUApi.Servicios;
+using MySql.Data.MySqlClient;
+
 
 
 namespace TCUApi.Controllers
@@ -38,12 +39,12 @@ namespace TCUApi.Controllers
         [Route("login")]
         public IActionResult IniciarSesion(UsuarioModel model)
         {
-            using (var context = new SqlConnection(_configuration.GetSection("ConnectionStrings:AbrazosDBConnection").Value))
+            using (var context = new MySqlConnection(_configuration.GetSection("ConnectionStrings:AbrazosDBConnection").Value))
             {
-
+                context.Open();
                 var contraEncriptada = Encrypt(model.Password!);
                 var result = context.QueryFirstOrDefault<UsuarioModel>("IniciarSesion",
-                    new { model.Username, password = contraEncriptada }, commandType: CommandType.StoredProcedure);
+                    new {   model.Username, p_password = contraEncriptada }, commandType: CommandType.StoredProcedure);
 
                 var respuesta = new RespuestaModel();
 
@@ -101,16 +102,17 @@ namespace TCUApi.Controllers
 
                 
 
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("AbrazosDBConnection")))
+                using (var connection = new MySqlConnection(_configuration.GetConnectionString("AbrazosDBConnection")))
                 {
                     var result = connection.Execute("RegistrarUsuario", new
                     {
-                        model.NombreUsuario,
-                        model.Cedula,
-                        model.Apellidos,
-                        model.Correo,
-                        username,
-                        password = passwordEncrypted,
+                        p_NombreUsuario= model.NombreUsuario,
+                        p_Cedula = model.Cedula,
+                        p_Apellidos = model.Apellidos,
+                        p_Correo =  model.Correo,
+                        p_Username = username,
+                        p_Password  = passwordEncrypted,
+                        p_Telefono = model.Telefono
                     });
 
 
@@ -120,7 +122,7 @@ namespace TCUApi.Controllers
                         var fechaVencimiento = model.password_temp_expiration = DateTime.Now.AddMinutes(double.Parse(_configuration.GetSection("Variables:MinutosVigenciaTemporal").Value!));
 
                         var datos = connection.QueryFirstOrDefault<UsuarioModel>("VerificarCorreo",
-                            new { model.Correo });
+                            new { p_Correo = model.Correo });
 
 
                         string ruta = Path.Combine(Directory.GetCurrentDirectory(), "Templates", "CorreoCodigoAcceso.html");
@@ -145,7 +147,7 @@ namespace TCUApi.Controllers
 
                 return Ok(respuesta);
             }
-            catch (SqlException sqlEx)
+            catch (MySqlException sqlEx)
             {
                 return StatusCode(500, new { error = "Error en la base de datos", Mensaje = sqlEx.Message });
             }
@@ -180,10 +182,10 @@ namespace TCUApi.Controllers
         {
             var respuesta = new RespuestaModel();
 
-            using (var context = new SqlConnection(_configuration.GetSection("ConnectionStrings:AbrazosDBConnection").Value))
+            using (var context = new MySqlConnection(_configuration.GetSection("ConnectionStrings:AbrazosDBConnection").Value))
             {
                 var result = context.QueryFirstOrDefault<UsuarioModel>("VerificarCorreo",
-                    new { model.Correo });
+                    new { p_Correo = model.Correo });
 
                 if (result != null)
                 {
@@ -211,7 +213,7 @@ namespace TCUApi.Controllers
                     var fechaVencimiento = model.password_temp_expiration = DateTime.Now.AddMinutes(double.Parse(_configuration.GetSection("Variables:MinutosVigenciaTemporal").Value!));
 
                     context.Execute("RecuperarContrasenna",
-                        new { result.Id_usuario, Contrasenna = contrasennaEncriptada, ContrasennaAnterior = contrasennaAnterior, VencimientoContraTemp = fechaVencimiento });
+                        new { p_Id_usuario = result.Id_usuario, p_Contrasenna = contrasennaEncriptada, p_ContrasennaAnterior = contrasennaAnterior, p_VencimientoContraTemp = fechaVencimiento });
 
 
                     string ruta = Path.Combine(Directory.GetCurrentDirectory(), "Templates", "TemplateCorreoRecuperarContrasena.html");

@@ -2,10 +2,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.SqlClient;
 using System.Data;
 using TCUApi.Model;
 using TCUApi.Servicios;
+using MySql.Data.MySqlClient;
 
 namespace TCUApi.Controllers
 {
@@ -37,19 +37,19 @@ namespace TCUApi.Controllers
 
                 RespuestaModel respuesta = new RespuestaModel();
 
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("AbrazosDBConnection")))
+                using (var connection = new MySqlConnection(_configuration.GetConnectionString("AbrazosDBConnection")))
                 {
-                    
 
+                    connection.Open();
                     var result = connection.Execute("RegistrarEvento", new
                     {
-                        model.Nombre_Evento,
-                        model.Descripcion,
-                        model.Fecha_Inicio,
-                        model.Fecha_Final,
-                        model.Color,
-                        model.Invitados,
-                    });
+                        p_Nombre_Evento = model.Nombre_Evento,
+                        p_Descripcion = model.Descripcion,
+                        p_Fecha_Inicio =  model.Fecha_Inicio,
+                        p_Fecha_Final = model.Fecha_Final,
+                        p_Color = model.Color,
+                        p_invitados = model.Invitados,
+                    },commandType: CommandType.StoredProcedure);
 
                     if (result > 0)
                     {
@@ -83,7 +83,7 @@ namespace TCUApi.Controllers
                     return Ok(respuesta);
                 }
             }
-            catch (SqlException sqlEx)
+            catch (MySqlException sqlEx)
             {
                 return StatusCode(500, new { error = "Error en la base de datos", detalle = sqlEx.Message });
             }
@@ -106,16 +106,17 @@ namespace TCUApi.Controllers
                 var idUsuarioLogueado = _general.ObtenerUsuarioFromToken(User.Claims);
                 var rolLogueado = _general.ObtenerRolFromToken(User.Claims);
 
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("AbrazosDBConnection")))
+                using (var connection = new MySqlConnection(_configuration.GetConnectionString("AbrazosDBConnection")))
                 {
+                    connection.Open();
                     var correoLogueado = connection.Query<string>(
                         "ObtenerCorreoById",
-                        new { Id_Usuario = idUsuarioLogueado },
+                        new { p_Id_usuario = idUsuarioLogueado },
                         commandType: CommandType.StoredProcedure
                     ).FirstOrDefault()?.Trim();
 
                     var datos = connection.Query<EventosModel>(
-                        "MostrarEventos", new { Id_Evento = 0 },
+                        "MostrarEventos", new { p_Id_Evento = 0 },
                         commandType: CommandType.StoredProcedure
                     ).ToList();
 
@@ -181,9 +182,10 @@ namespace TCUApi.Controllers
                 {
                     return Unauthorized(new { mensaje = "No tiene permisos para eliminar un evento" });
                 }
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("AbrazosDBConnection")))
+                using (var connection = new MySqlConnection(_configuration.GetConnectionString("AbrazosDBConnection")))
                 {
-                    var result = connection.Execute("EliminarEvento", new { Id_Evento = id }, commandType: CommandType.StoredProcedure);
+                    connection.Open();
+                    var result = connection.Execute("EliminarEvento", new { p_Id_Evento = id }, commandType: CommandType.StoredProcedure);
                     if (result > 0)
                     {
                         respuesta.Indicador = true;
@@ -197,7 +199,7 @@ namespace TCUApi.Controllers
                     return Ok(respuesta);
                 }
             }
-            catch (SqlException sqlEx)
+            catch (MySqlException sqlEx)
             {
                 return StatusCode(500, new { error = "Error en la base de datos", detalle = sqlEx.Message });
             }
@@ -227,10 +229,17 @@ namespace TCUApi.Controllers
                 {
                     return Unauthorized(new { mensaje = "No tiene permisos para eliminar un evento" });
                 }
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("AbrazosDBConnection")))
+                using (var connection = new MySqlConnection(_configuration.GetConnectionString("AbrazosDBConnection")))
                 {
+                    connection.Open();
                     RespuestaModel respuesta = new RespuestaModel();
-                    var result = connection.Execute("ActualizarEvento", new { model.Id_Evento,model.Nombre_Evento,model.Descripcion, model.Fecha_Inicio, model.Fecha_Final }, commandType: CommandType.StoredProcedure);
+                    var result = connection.Execute("ActualizarEvento", new { 
+                        p_Id_Evento = model.Id_Evento,
+                        p_Nombre_Evento = model.Nombre_Evento,
+                        p_Descripcion = model.Descripcion,
+                        p_Fecha_Inicio = model.Fecha_Inicio,
+                        p_Fecha_Final = model.Fecha_Final 
+                    }, commandType: CommandType.StoredProcedure);
                     if (result > 0)
                     {
                         respuesta.Indicador = true;
@@ -244,7 +253,7 @@ namespace TCUApi.Controllers
                     return Ok(respuesta);
                 }
             }
-            catch (SqlException sqlEx)
+            catch (MySqlException sqlEx)
             {
                 return StatusCode(500, new { error = "Error en la base de datos", detalle = sqlEx.Message });
             }
@@ -270,11 +279,12 @@ namespace TCUApi.Controllers
                 }
                 var idUsuarioLogueado = _general.ObtenerUsuarioFromToken(User.Claims);
 
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("AbrazosDBConnection")))
+                using (var connection = new MySqlConnection(_configuration.GetConnectionString("AbrazosDBConnection")))
                 {
+                    connection.Open();
                     var correoLogueado = connection.Query<string>(
                         "ObtenerCorreoById",
-                        new { Id_Usuario = idUsuarioLogueado },
+                        new { p_Id_usuario = idUsuarioLogueado },
                         commandType: CommandType.StoredProcedure
                     ).FirstOrDefault()?.Trim();
 
@@ -285,8 +295,8 @@ namespace TCUApi.Controllers
                         "ObtenerCorreosSeleccionados",
                         new
                         {
-                            CorreoLogueado = correoLogueado,
-                            Filtro = q // Puede ser null o un valor
+                            p_CorreoLogueado = correoLogueado,
+                            p_Filtro = q 
                         },
                         commandType: CommandType.StoredProcedure
                     ).ToList();
@@ -318,11 +328,12 @@ namespace TCUApi.Controllers
             {
                 
 
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("AbrazosDBConnection")))
+                using (var connection = new MySqlConnection(_configuration.GetConnectionString("AbrazosDBConnection")))
                 {
+                    connection.Open();
                     var evento = connection.Query<EventosModel>(
                         "MostrarEventos",
-                        new { Id_Evento = id },
+                        new { p_Id_Evento = id },
                         commandType: CommandType.StoredProcedure
                     ).FirstOrDefault();
 

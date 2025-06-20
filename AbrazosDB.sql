@@ -1,1184 +1,1368 @@
-USE [master]
-GO
-/****** Object:  Database [AbrazosDB]    Script Date: 20/06/2025 10:07:40 a. m. ******/
-CREATE DATABASE [AbrazosDB]
- CONTAINMENT = NONE
- ON  PRIMARY 
-( NAME = N'abrazos', FILENAME = N'C:\Program Files\Microsoft SQL Server\MSSQL16.MSSQLSERVER\MSSQL\DATA\abrazos.mdf' , SIZE = 8192KB , MAXSIZE = UNLIMITED, FILEGROWTH = 65536KB )
- LOG ON 
-( NAME = N'abrazos_log', FILENAME = N'C:\Program Files\Microsoft SQL Server\MSSQL16.MSSQLSERVER\MSSQL\DATA\abrazos_log.ldf' , SIZE = 8192KB , MAXSIZE = 2048GB , FILEGROWTH = 65536KB )
- WITH CATALOG_COLLATION = DATABASE_DEFAULT, LEDGER = OFF
-GO
-ALTER DATABASE [AbrazosDB] SET COMPATIBILITY_LEVEL = 160
-GO
-IF (1 = FULLTEXTSERVICEPROPERTY('IsFullTextInstalled'))
-begin
-EXEC [AbrazosDB].[dbo].[sp_fulltext_database] @action = 'enable'
-end
-GO
-ALTER DATABASE [AbrazosDB] SET ANSI_NULL_DEFAULT OFF 
-GO
-ALTER DATABASE [AbrazosDB] SET ANSI_NULLS OFF 
-GO
-ALTER DATABASE [AbrazosDB] SET ANSI_PADDING OFF 
-GO
-ALTER DATABASE [AbrazosDB] SET ANSI_WARNINGS OFF 
-GO
-ALTER DATABASE [AbrazosDB] SET ARITHABORT OFF 
-GO
-ALTER DATABASE [AbrazosDB] SET AUTO_CLOSE OFF 
-GO
-ALTER DATABASE [AbrazosDB] SET AUTO_SHRINK OFF 
-GO
-ALTER DATABASE [AbrazosDB] SET AUTO_UPDATE_STATISTICS ON 
-GO
-ALTER DATABASE [AbrazosDB] SET CURSOR_CLOSE_ON_COMMIT OFF 
-GO
-ALTER DATABASE [AbrazosDB] SET CURSOR_DEFAULT  GLOBAL 
-GO
-ALTER DATABASE [AbrazosDB] SET CONCAT_NULL_YIELDS_NULL OFF 
-GO
-ALTER DATABASE [AbrazosDB] SET NUMERIC_ROUNDABORT OFF 
-GO
-ALTER DATABASE [AbrazosDB] SET QUOTED_IDENTIFIER OFF 
-GO
-ALTER DATABASE [AbrazosDB] SET RECURSIVE_TRIGGERS OFF 
-GO
-ALTER DATABASE [AbrazosDB] SET  ENABLE_BROKER 
-GO
-ALTER DATABASE [AbrazosDB] SET AUTO_UPDATE_STATISTICS_ASYNC OFF 
-GO
-ALTER DATABASE [AbrazosDB] SET DATE_CORRELATION_OPTIMIZATION OFF 
-GO
-ALTER DATABASE [AbrazosDB] SET TRUSTWORTHY OFF 
-GO
-ALTER DATABASE [AbrazosDB] SET ALLOW_SNAPSHOT_ISOLATION OFF 
-GO
-ALTER DATABASE [AbrazosDB] SET PARAMETERIZATION SIMPLE 
-GO
-ALTER DATABASE [AbrazosDB] SET READ_COMMITTED_SNAPSHOT OFF 
-GO
-ALTER DATABASE [AbrazosDB] SET HONOR_BROKER_PRIORITY OFF 
-GO
-ALTER DATABASE [AbrazosDB] SET RECOVERY FULL 
-GO
-ALTER DATABASE [AbrazosDB] SET  MULTI_USER 
-GO
-ALTER DATABASE [AbrazosDB] SET PAGE_VERIFY CHECKSUM  
-GO
-ALTER DATABASE [AbrazosDB] SET DB_CHAINING OFF 
-GO
-ALTER DATABASE [AbrazosDB] SET FILESTREAM( NON_TRANSACTED_ACCESS = OFF ) 
-GO
-ALTER DATABASE [AbrazosDB] SET TARGET_RECOVERY_TIME = 60 SECONDS 
-GO
-ALTER DATABASE [AbrazosDB] SET DELAYED_DURABILITY = DISABLED 
-GO
-ALTER DATABASE [AbrazosDB] SET ACCELERATED_DATABASE_RECOVERY = OFF  
-GO
-EXEC sys.sp_db_vardecimal_storage_format N'AbrazosDB', N'ON'
-GO
-ALTER DATABASE [AbrazosDB] SET QUERY_STORE = ON
-GO
-ALTER DATABASE [AbrazosDB] SET QUERY_STORE (OPERATION_MODE = READ_WRITE, CLEANUP_POLICY = (STALE_QUERY_THRESHOLD_DAYS = 30), DATA_FLUSH_INTERVAL_SECONDS = 900, INTERVAL_LENGTH_MINUTES = 60, MAX_STORAGE_SIZE_MB = 1000, QUERY_CAPTURE_MODE = AUTO, SIZE_BASED_CLEANUP_MODE = AUTO, MAX_PLANS_PER_QUERY = 200, WAIT_STATS_CAPTURE_MODE = ON)
-GO
-USE [AbrazosDB]
-GO
-/****** Object:  Table [dbo].[ArchivosUser]    Script Date: 20/06/2025 10:07:40 a. m. ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-CREATE TABLE [dbo].[ArchivosUser](
-	[Id_ArchivoUser] [bigint] IDENTITY(1,1) NOT NULL,
-	[Nombre] [varchar](100) NOT NULL,
-	[Tipo] [varchar](255) NOT NULL,
-	[Ruta] [varchar](500) NOT NULL,
-	[FechaSubida] [datetime] NOT NULL,
- CONSTRAINT [PK_ArchivosUser] PRIMARY KEY CLUSTERED 
-(
-	[Id_ArchivoUser] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
-) ON [PRIMARY]
-GO
-/****** Object:  Table [dbo].[categoria]    Script Date: 20/06/2025 10:07:40 a. m. ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-CREATE TABLE [dbo].[categoria](
-	[id_categoria] [int] IDENTITY(1,1) NOT NULL,
-	[nombre] [nvarchar](100) NOT NULL,
-	[descripcion] [nvarchar](255) NOT NULL,
-PRIMARY KEY CLUSTERED 
-(
-	[id_categoria] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
-) ON [PRIMARY]
-GO
-/****** Object:  Table [dbo].[EstadoRegistro]    Script Date: 20/06/2025 10:07:40 a. m. ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-CREATE TABLE [dbo].[EstadoRegistro](
-	[Id_EstadoRegistro] [bigint] IDENTITY(1,1) NOT NULL,
-	[Nombre] [varchar](100) NOT NULL,
- CONSTRAINT [PK_EstadoRegistro] PRIMARY KEY CLUSTERED 
-(
-	[Id_EstadoRegistro] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
-) ON [PRIMARY]
-GO
-/****** Object:  Table [dbo].[Eventos]    Script Date: 20/06/2025 10:07:40 a. m. ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-CREATE TABLE [dbo].[Eventos](
-	[Id_Evento] [bigint] IDENTITY(1,1) NOT NULL,
-	[Nombre_Evento] [varchar](50) NOT NULL,
-	[Descripcion] [text] NOT NULL,
-	[Fecha_Inicio] [datetime] NOT NULL,
-	[Fecha_Final] [datetime] NOT NULL,
-	[Color] [varchar](7) NOT NULL,
-	[invitados] [text] NOT NULL,
- CONSTRAINT [PK_Eventos] PRIMARY KEY CLUSTERED 
-(
-	[Id_Evento] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
-) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
-GO
-/****** Object:  Table [dbo].[Expedientes]    Script Date: 20/06/2025 10:07:40 a. m. ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-CREATE TABLE [dbo].[Expedientes](
-	[Id_Archivo] [bigint] IDENTITY(1,1) NOT NULL,
-	[Nombre] [varchar](100) NOT NULL,
-	[Tipo] [varchar](255) NOT NULL,
-	[Ruta] [varchar](500) NOT NULL,
-	[FechaSubida] [datetime] NOT NULL,
-	[Id_Familia] [bigint] NOT NULL,
- CONSTRAINT [PK_Expedientes] PRIMARY KEY CLUSTERED 
-(
-	[Id_Archivo] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
-) ON [PRIMARY]
-GO
-/****** Object:  Table [dbo].[familias]    Script Date: 20/06/2025 10:07:40 a. m. ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-CREATE TABLE [dbo].[familias](
-	[id_familia] [bigint] IDENTITY(1,1) NOT NULL,
-	[nombre_representante] [nvarchar](100) NOT NULL,
-	[direccion] [nvarchar](255) NOT NULL,
-	[telefono] [varchar](8) NOT NULL,
-	[cantidad_familiares] [int] NOT NULL,
-	[cantidad_ninos] [int] NOT NULL,
-	[id_vulnerabilidad] [int] NOT NULL,
-	[presupuesto] [decimal](10, 2) NULL,
-	[cedula_representante] [varchar](100) NOT NULL,
- CONSTRAINT [PK__familias__609C48522D019818] PRIMARY KEY CLUSTERED 
-(
-	[id_familia] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
-) ON [PRIMARY]
-GO
-/****** Object:  Table [dbo].[inventario]    Script Date: 20/06/2025 10:07:40 a. m. ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-CREATE TABLE [dbo].[inventario](
-	[id_inventario] [int] IDENTITY(1,1) NOT NULL,
-	[nombre] [nvarchar](100) NOT NULL,
-	[id_categoria] [int] NOT NULL,
-	[stock] [int] NOT NULL,
-PRIMARY KEY CLUSTERED 
-(
-	[id_inventario] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
-) ON [PRIMARY]
-GO
-/****** Object:  Table [dbo].[presupuestos]    Script Date: 20/06/2025 10:07:40 a. m. ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-CREATE TABLE [dbo].[presupuestos](
-	[id_presupuesto] [int] IDENTITY(1,1) NOT NULL,
-	[id_familia] [bigint] NOT NULL,
-	[monto_total] [decimal](10, 2) NOT NULL,
-	[descripcion] [nvarchar](max) NOT NULL,
- CONSTRAINT [PK__presupue__3E94B4E548F609DD] PRIMARY KEY CLUSTERED 
-(
-	[id_presupuesto] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
-) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
-GO
-/****** Object:  Table [dbo].[rol]    Script Date: 20/06/2025 10:07:40 a. m. ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-CREATE TABLE [dbo].[rol](
-	[id_rol] [int] IDENTITY(1,1) NOT NULL,
-	[nombre] [nvarchar](100) NOT NULL,
-PRIMARY KEY CLUSTERED 
-(
-	[id_rol] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
-) ON [PRIMARY]
-GO
-/****** Object:  Table [dbo].[usuarios]    Script Date: 20/06/2025 10:07:40 a. m. ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-CREATE TABLE [dbo].[usuarios](
-	[id_usuario] [bigint] IDENTITY(1,1) NOT NULL,
-	[Cedula] [varchar](50) NOT NULL,
-	[nombre] [nvarchar](100) NOT NULL,
-	[apellidos] [nvarchar](100) NOT NULL,
-	[correo] [nvarchar](100) NOT NULL,
-	[username] [nvarchar](100) NOT NULL,
-	[password] [nvarchar](100) NOT NULL,
-	[id_rol] [int] NOT NULL,
-	[fecha_registro] [date] NOT NULL,
-	[password_temp_status] [bit] NULL,
-	[password_temp_expiration] [datetime] NULL,
-	[Id_ArchivosUser] [bigint] NULL,
-	[Id_EstadoRegistro] [bigint] NULL,
- CONSTRAINT [PK__usuarios__4E3E04AD0492928B] PRIMARY KEY CLUSTERED 
-(
-	[id_usuario] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
-) ON [PRIMARY]
-GO
-/****** Object:  Table [dbo].[voluntarios]    Script Date: 20/06/2025 10:07:40 a. m. ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-CREATE TABLE [dbo].[voluntarios](
-	[id_voluntario] [int] IDENTITY(1,1) NOT NULL,
-	[id_usuario] [bigint] NOT NULL,
-	[habilidades] [nvarchar](255) NOT NULL,
-	[horario_disponible] [nvarchar](255) NOT NULL,
- CONSTRAINT [PK__voluntar__9A7281F9D648F070] PRIMARY KEY CLUSTERED 
-(
-	[id_voluntario] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
-) ON [PRIMARY]
-GO
-/****** Object:  Table [dbo].[vulnerabilidad]    Script Date: 20/06/2025 10:07:40 a. m. ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-CREATE TABLE [dbo].[vulnerabilidad](
-	[id_vulnerabilidad] [int] IDENTITY(1,1) NOT NULL,
-	[nombre] [nvarchar](50) NOT NULL,
-PRIMARY KEY CLUSTERED 
-(
-	[id_vulnerabilidad] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
-) ON [PRIMARY]
-GO
-ALTER TABLE [dbo].[familias]  WITH CHECK ADD  CONSTRAINT [FK_FAMILIAS_VULNERABILIDAD] FOREIGN KEY([id_vulnerabilidad])
-REFERENCES [dbo].[vulnerabilidad] ([id_vulnerabilidad])
-GO
-ALTER TABLE [dbo].[familias] CHECK CONSTRAINT [FK_FAMILIAS_VULNERABILIDAD]
-GO
-ALTER TABLE [dbo].[inventario]  WITH CHECK ADD  CONSTRAINT [FK_INVENTARIO_CATEGORIA] FOREIGN KEY([id_categoria])
-REFERENCES [dbo].[categoria] ([id_categoria])
-GO
-ALTER TABLE [dbo].[inventario] CHECK CONSTRAINT [FK_INVENTARIO_CATEGORIA]
-GO
-ALTER TABLE [dbo].[presupuestos]  WITH CHECK ADD  CONSTRAINT [FK_PRESUPUESTOS_FAMILIAS] FOREIGN KEY([id_familia])
-REFERENCES [dbo].[familias] ([id_familia])
-GO
-ALTER TABLE [dbo].[presupuestos] CHECK CONSTRAINT [FK_PRESUPUESTOS_FAMILIAS]
-GO
-ALTER TABLE [dbo].[voluntarios]  WITH CHECK ADD  CONSTRAINT [FK_VOLUNTARIOS_USUARIOS] FOREIGN KEY([id_usuario])
-REFERENCES [dbo].[usuarios] ([id_usuario])
-GO
-ALTER TABLE [dbo].[voluntarios] CHECK CONSTRAINT [FK_VOLUNTARIOS_USUARIOS]
-GO
-/****** Object:  StoredProcedure [dbo].[AccesoUsuarios]    Script Date: 20/06/2025 10:07:40 a. m. ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-CREATE PROCEDURE [dbo].[AccesoUsuarios]
-    @Id_Usuario bigint,
-    @Id_EstadoRegistro Bigint
-AS
-BEGIN
-    UPDATE dbo.usuarios 
-    SET Id_EstadoRegistro = @Id_EstadoRegistro
-    WHERE id_usuario = @Id_Usuario;
+CREATE DATABASE  IF NOT EXISTS `abrazosdb` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+USE `abrazosdb`;
+-- MySQL dump 10.13  Distrib 8.0.40, for Win64 (x86_64)
+--
+-- Host: localhost    Database: abrazosdb
+-- ------------------------------------------------------
+-- Server version	9.1.0
 
-    IF (@Id_EstadoRegistro = 2)
-    BEGIN
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!50503 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `archivosuser`
+--
+
+DROP TABLE IF EXISTS `archivosuser`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `archivosuser` (
+  `Id_ArchivoUser` bigint NOT NULL,
+  `Nombre` varchar(100) NOT NULL,
+  `Tipo` varchar(255) NOT NULL,
+  `Ruta` varchar(500) NOT NULL,
+  `FechaSubida` datetime NOT NULL,
+  PRIMARY KEY (`Id_ArchivoUser`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `archivosuser`
+--
+
+LOCK TABLES `archivosuser` WRITE;
+/*!40000 ALTER TABLE `archivosuser` DISABLE KEYS */;
+/*!40000 ALTER TABLE `archivosuser` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `categoria`
+--
+
+DROP TABLE IF EXISTS `categoria`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `categoria` (
+  `id_categoria` int NOT NULL,
+  `nombre` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `descripcion` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  PRIMARY KEY (`id_categoria`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `categoria`
+--
+
+LOCK TABLES `categoria` WRITE;
+/*!40000 ALTER TABLE `categoria` DISABLE KEYS */;
+INSERT INTO `categoria` VALUES (1,'Comestibles','Productos para la alimentacion de las familias'),(2,'Ropa','Ropa para las familias');
+/*!40000 ALTER TABLE `categoria` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `estadoregistro`
+--
+
+DROP TABLE IF EXISTS `estadoregistro`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `estadoregistro` (
+  `Id_EstadoRegistro` bigint NOT NULL,
+  `Nombre` varchar(100) NOT NULL,
+  PRIMARY KEY (`Id_EstadoRegistro`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `estadoregistro`
+--
+
+LOCK TABLES `estadoregistro` WRITE;
+/*!40000 ALTER TABLE `estadoregistro` DISABLE KEYS */;
+INSERT INTO `estadoregistro` VALUES (1,'Aceptado'),(2,'Denegado'),(3,'En espera');
+/*!40000 ALTER TABLE `estadoregistro` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `eventos`
+--
+
+DROP TABLE IF EXISTS `eventos`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `eventos` (
+  `Id_Evento` bigint NOT NULL AUTO_INCREMENT,
+  `Nombre_Evento` varchar(50) NOT NULL,
+  `Descripcion` longtext NOT NULL,
+  `Fecha_Inicio` datetime NOT NULL,
+  `Fecha_Final` datetime NOT NULL,
+  `Color` varchar(7) NOT NULL,
+  `invitados` longtext NOT NULL,
+  PRIMARY KEY (`Id_Evento`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `eventos`
+--
+
+LOCK TABLES `eventos` WRITE;
+/*!40000 ALTER TABLE `eventos` DISABLE KEYS */;
+/*!40000 ALTER TABLE `eventos` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `expedientes`
+--
+
+DROP TABLE IF EXISTS `expedientes`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `expedientes` (
+  `Id_Archivo` bigint NOT NULL,
+  `Nombre` varchar(100) NOT NULL,
+  `Tipo` varchar(255) NOT NULL,
+  `Ruta` varchar(500) NOT NULL,
+  `FechaSubida` datetime NOT NULL,
+  `Id_Familia` bigint NOT NULL,
+  PRIMARY KEY (`Id_Archivo`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `expedientes`
+--
+
+LOCK TABLES `expedientes` WRITE;
+/*!40000 ALTER TABLE `expedientes` DISABLE KEYS */;
+INSERT INTO `expedientes` VALUES (2,'CasoEsatudio1.pdf','application/pdf','iMrstGkUck5z09C48YoPhm/N+skRXMNzEU3VRzJykCrio41+N6ElJdAuJx3Xmx04j+htGmVRGCOLzpIFvwRtgUHUURFJOegQ1hKVXh9fsr4=','2025-04-01 11:27:13',2);
+/*!40000 ALTER TABLE `expedientes` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `familias`
+--
+
+DROP TABLE IF EXISTS `familias`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `familias` (
+  `id_familia` bigint NOT NULL AUTO_INCREMENT,
+  `nombre_representante` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `direccion` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `telefono` varchar(8) NOT NULL,
+  `cantidad_familiares` int NOT NULL,
+  `cantidad_ninos` int NOT NULL,
+  `id_vulnerabilidad` int NOT NULL,
+  `presupuesto` decimal(10,2) DEFAULT NULL,
+  `cedula_representante` varchar(100) NOT NULL,
+  PRIMARY KEY (`id_familia`),
+  KEY `FK_FAMILIAS_VULNERABILIDAD` (`id_vulnerabilidad`),
+  CONSTRAINT `FK_FAMILIAS_VULNERABILIDAD` FOREIGN KEY (`id_vulnerabilidad`) REFERENCES `vulnerabilidad` (`id_vulnerabilidad`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `familias`
+--
+
+LOCK TABLES `familias` WRITE;
+/*!40000 ALTER TABLE `familias` DISABLE KEYS */;
+INSERT INTO `familias` VALUES (2,'STEVEN ROBERT CLOUDT ACHOY','Cartago Centro','12345678',4,3,2,126315.79,'901190754');
+/*!40000 ALTER TABLE `familias` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `inventario`
+--
+
+DROP TABLE IF EXISTS `inventario`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `inventario` (
+  `id_inventario` int NOT NULL AUTO_INCREMENT,
+  `nombre` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `id_categoria` int NOT NULL,
+  `stock` int NOT NULL,
+  PRIMARY KEY (`id_inventario`),
+  KEY `FK_INVENTARIO_CATEGORIA` (`id_categoria`),
+  CONSTRAINT `FK_INVENTARIO_CATEGORIA` FOREIGN KEY (`id_categoria`) REFERENCES `categoria` (`id_categoria`)
+) ENGINE=InnoDB AUTO_INCREMENT=2011 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `inventario`
+--
+
+LOCK TABLES `inventario` WRITE;
+/*!40000 ALTER TABLE `inventario` DISABLE KEYS */;
+INSERT INTO `inventario` VALUES (2010,'Frijoles',1,23);
+/*!40000 ALTER TABLE `inventario` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `rol`
+--
+
+DROP TABLE IF EXISTS `rol`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `rol` (
+  `id_rol` int NOT NULL,
+  `nombre` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  PRIMARY KEY (`id_rol`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `rol`
+--
+
+LOCK TABLES `rol` WRITE;
+/*!40000 ALTER TABLE `rol` DISABLE KEYS */;
+INSERT INTO `rol` VALUES (1,'Administrador'),(2,'Voluntario');
+/*!40000 ALTER TABLE `rol` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `usuarios`
+--
+
+DROP TABLE IF EXISTS `usuarios`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `usuarios` (
+  `id_usuario` bigint NOT NULL AUTO_INCREMENT,
+  `Cedula` varchar(50) NOT NULL,
+  `nombre` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `apellidos` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `correo` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `username` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `password` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `id_rol` int NOT NULL,
+  `fecha_registro` date NOT NULL,
+  `password_temp_status` tinyint(1) DEFAULT NULL,
+  `password_temp_expiration` datetime DEFAULT NULL,
+  `Id_ArchivosUser` bigint DEFAULT NULL,
+  `Id_EstadoRegistro` bigint DEFAULT NULL,
+  `telefono` int NOT NULL,
+  PRIMARY KEY (`id_usuario`)
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `usuarios`
+--
+
+LOCK TABLES `usuarios` WRITE;
+/*!40000 ALTER TABLE `usuarios` DISABLE KEYS */;
+INSERT INTO `usuarios` VALUES (4,'305590015','SEBASTIAN','COTO GONZALEZ	','secogonzalez2005@gmail.com','scoto','Y4dZkkZdfWjaSVA6O/HUOg==',1,'2025-04-25',0,'2025-06-20 13:07:23',NULL,1,0);
+/*!40000 ALTER TABLE `usuarios` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `vulnerabilidad`
+--
+
+DROP TABLE IF EXISTS `vulnerabilidad`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `vulnerabilidad` (
+  `id_vulnerabilidad` int NOT NULL,
+  `nombre` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  PRIMARY KEY (`id_vulnerabilidad`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `vulnerabilidad`
+--
+
+LOCK TABLES `vulnerabilidad` WRITE;
+/*!40000 ALTER TABLE `vulnerabilidad` DISABLE KEYS */;
+INSERT INTO `vulnerabilidad` VALUES (1,'Alta'),(2,'Media'),(3,'Baja');
+/*!40000 ALTER TABLE `vulnerabilidad` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Dumping events for database 'abrazosdb'
+--
+
+--
+-- Dumping routines for database 'abrazosdb'
+--
+/*!50003 DROP PROCEDURE IF EXISTS `AccesoUsuarios` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `AccesoUsuarios`(
+    IN p_Id_Usuario BIGINT,
+    IN p_Id_EstadoRegistro BIGINT
+)
+BEGIN
+    -- Actualizar el estado del usuario
+    UPDATE usuarios 
+    SET Id_EstadoRegistro = p_Id_EstadoRegistro
+    WHERE id_usuario = p_Id_Usuario;
+
+    -- Si el nuevo estado es 2, eliminar el usuario
+    IF p_Id_EstadoRegistro = 2 THEN
         DELETE FROM usuarios 
-        WHERE id_usuario = @Id_Usuario
+        WHERE id_usuario = p_Id_Usuario
         AND Id_EstadoRegistro = 2;
 
         SELECT 'ELIMINADO' AS Nombre;
-        RETURN;
-    END
-
-    SELECT Nombre 
-    FROM dbo.EstadoRegistro 
-    WHERE Id_EstadoRegistro = @Id_EstadoRegistro;
-END
-GO
-/****** Object:  StoredProcedure [dbo].[ActualizarContrasenna]    Script Date: 20/06/2025 10:07:40 a. m. ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-CREATE PROCEDURE [dbo].[ActualizarContrasenna]
-    @Id_usuario bigint,
-    @Contrasena varchar(50),
-    @ContrasennaAnterior varchar(100),
-    @ContrasennaConfirmar varchar(100)
-AS
+    ELSE
+        SELECT Nombre 
+        FROM EstadoRegistro 
+        WHERE Id_EstadoRegistro = p_Id_EstadoRegistro;
+    END IF;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `ActualizarContrasenna` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `ActualizarContrasenna`(
+    IN p_Id_usuario BIGINT,
+    IN p_Contrasena VARCHAR(50),
+    IN p_ContrasennaAnterior VARCHAR(100),
+    IN p_ContrasennaConfirmar VARCHAR(100)
+)
 BEGIN
-    DECLARE @PasswordActual varchar(100);
+    DECLARE v_PasswordActual VARCHAR(100);
 
-    SELECT @PasswordActual = password 
+    SELECT password INTO v_PasswordActual
     FROM usuarios 
-    WHERE id_usuario = @Id_usuario;
+    WHERE id_usuario = p_Id_usuario;
 
-    IF (@ContrasennaAnterior = @PasswordActual)
-    BEGIN
+    IF p_ContrasennaAnterior = v_PasswordActual THEN
         UPDATE usuarios
-        SET password = @Contrasena,
+        SET password = p_Contrasena,
             password_temp_status = 0,
-            password_temp_expiration = GETDATE()
-        WHERE id_usuario = @Id_usuario;
-    END
+            password_temp_expiration = NOW(3)
+        WHERE id_usuario = p_Id_usuario;
     ELSE
-    BEGIN
-        RAISERROR('La contraseña anterior no es correcta.', 16, 1);
-    END
-END
-GO
-/****** Object:  StoredProcedure [dbo].[ActualizarEvento]    Script Date: 20/06/2025 10:07:40 a. m. ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-
-CREATE PROCEDURE [dbo].[ActualizarEvento]
-	@Id_Evento BIGINT,
-	@Nombre_Evento varchar(50),
-	@Descripcion text ,
-    @Fecha_Inicio Datetime,
-	@Fecha_Final Datetime
-AS
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'La contraseña anterior no es correcta.';
+    END IF;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `ActualizarEvento` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `ActualizarEvento`(
+    IN p_Id_Evento BIGINT,
+    IN p_Nombre_Evento VARCHAR(50),
+    IN p_Descripcion TEXT,
+    IN p_Fecha_Inicio DATETIME,
+    IN p_Fecha_Final DATETIME
+)
 BEGIN
-        UPDATE dbo.Eventos SET Nombre_Evento = @Nombre_Evento, Descripcion = @Descripcion, Fecha_Inicio =@Fecha_Inicio,Fecha_Final = @Fecha_Final
-		WHERE Id_Evento = @Id_Evento
-    
-
-END
-GO
-/****** Object:  StoredProcedure [dbo].[ActualizarFamilia]    Script Date: 20/06/2025 10:07:40 a. m. ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-CREATE PROCEDURE [dbo].[ActualizarFamilia]
-    @Id_Familia bigint,
-    @Nombre_Representante nvarchar(100),
-    @Cedula_Representante varchar(100),
-    @Direccion nvarchar(255),
-    @Telefono varchar(8),
-    @Cantidad_Familiares int,
-    @Cantidad_Ninos int,
-    @Id_Vulnerabilidad int
-AS
+    UPDATE Eventos
+    SET Nombre_Evento = p_Nombre_Evento,
+        Descripcion = p_Descripcion,
+        Fecha_Inicio = p_Fecha_Inicio,
+        Fecha_Final = p_Fecha_Final
+    WHERE Id_Evento = p_Id_Evento;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `ActualizarFamilia` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `ActualizarFamilia`(
+    IN p_Id_Familia BIGINT,
+    IN p_Nombre_Representante VARCHAR(100),
+    IN p_Cedula_Representante VARCHAR(100),
+    IN p_Direccion VARCHAR(255),
+    IN p_Telefono VARCHAR(8),
+    IN p_Cantidad_Familiares INT,
+    IN p_Cantidad_Ninos INT,
+    IN p_Id_Vulnerabilidad INT
+)
 BEGIN
-    IF NOT EXISTS (SELECT 1 FROM dbo.familias 
-                   WHERE id_familia = @Id_Familia)
-    BEGIN
-        RAISERROR('No se encuentra la familia.', 16, 1);
-    END
+    DECLARE v_SUMA_PRESUPUESTO DOUBLE;
+
+    IF NOT EXISTS (
+        SELECT 1 FROM familias WHERE id_familia = p_Id_Familia
+    ) THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'No se encuentra la familia.';
     ELSE
-    BEGIN
-        UPDATE dbo.familias
-        SET nombre_representante = @Nombre_Representante,
-            cedula_representante = @Cedula_Representante,
-            direccion = @Direccion,
-            telefono = @Telefono,
-            cantidad_familiares = @Cantidad_Familiares,
-            cantidad_ninos = @Cantidad_Ninos,
-            id_vulnerabilidad = @Id_Vulnerabilidad
-        WHERE id_familia = @Id_Familia;
+        UPDATE familias
+        SET nombre_representante = p_Nombre_Representante,
+            cedula_representante = p_Cedula_Representante,
+            direccion = p_Direccion,
+            telefono = p_Telefono,
+            cantidad_familiares = p_Cantidad_Familiares,
+            cantidad_ninos = p_Cantidad_Ninos,
+            id_vulnerabilidad = p_Id_Vulnerabilidad
+        WHERE id_familia = p_Id_Familia;
 
-        DECLARE @SUMA_PRESUPUESTO FLOAT;
-        SELECT @SUMA_PRESUPUESTO = SUM(presupuesto) 
-        FROM dbo.familias;
+        SELECT SUM(presupuesto) INTO v_SUMA_PRESUPUESTO
+        FROM familias;
 
-        PRINT @SUMA_PRESUPUESTO;
-        EXEC [dbo].[CalcularPresupuesto] @MONTO_TOTAL = @SUMA_PRESUPUESTO;
-    END
-END
-GO
-/****** Object:  StoredProcedure [dbo].[ActualizarProducto]    Script Date: 20/06/2025 10:07:40 a. m. ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-CREATE PROCEDURE [dbo].[ActualizarProducto]
-	@Id_Inventario INT,
-	@NombreProducto NVARCHAR(100),
-	@Id_Categoria INT,
-    @stock INT
-AS
+        CALL CalcularPresupuesto(v_SUMA_PRESUPUESTO);
+    END IF;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `ActualizarProducto` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `ActualizarProducto`(
+    IN p_Id_Inventario INT,
+    IN p_NombreProducto VARCHAR(100),
+    IN p_Id_Categoria INT,
+    IN p_stock INT
+)
 BEGIN
-
-    -- Verifica si existe otro producto con el mismo nombre y que no sea el mismo producto
-    IF EXISTS(SELECT 1 FROM dbo.inventario 
-              WHERE nombre = @NombreProducto AND id_inventario != @Id_Inventario)
-    BEGIN
-        RAISERROR('El producto ya existe.', 16, 1);
-    END
+    IF EXISTS (
+        SELECT 1 FROM inventario 
+        WHERE nombre = p_NombreProducto AND id_inventario != p_Id_Inventario
+    ) THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El producto ya existe.';
     ELSE
-    BEGIN
-        -- Actualiza el producto
-        UPDATE dbo.inventario 
-        SET nombre = @NombreProducto, id_categoria = @Id_Categoria, stock = @stock
-		WHERE id_inventario = @Id_Inventario
-    END
-
-END
-GO
-/****** Object:  StoredProcedure [dbo].[ActualizarUsuario]    Script Date: 20/06/2025 10:07:40 a. m. ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-CREATE PROCEDURE [dbo].[ActualizarUsuario]
-    @Id_Usuario bigint,
-    @NombreUsuario nvarchar(100),
-    @Apellidos nvarchar(100),
-    @Correo nvarchar(100),
-    @Username nvarchar(100),
-    @Id_Rol int
-AS
+        UPDATE inventario 
+        SET nombre = p_NombreProducto, 
+            id_categoria = p_Id_Categoria, 
+            stock = p_stock
+        WHERE id_inventario = p_Id_Inventario;
+    END IF;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `ActualizarUsuario` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `ActualizarUsuario`(
+    IN p_Id_Usuario BIGINT,
+    IN p_NombreUsuario VARCHAR(100),
+    IN p_Apellidos VARCHAR(100),
+    IN p_Correo VARCHAR(100),
+    IN p_Username VARCHAR(100),
+    IN p_Id_Rol INT
+)
 BEGIN
-    -- Validar si el correo o username ya existen para otro usuario
-    IF EXISTS(SELECT 1 FROM dbo.usuarios 
-              WHERE (username = @Username OR correo = @Correo)
-                AND id_usuario <> @Id_Usuario)
-    BEGIN
-        RAISERROR('El nombre de usuario o correo ya existe.', 16, 1);
-    END
+    IF EXISTS (
+        SELECT 1 FROM usuarios 
+        WHERE (username = p_Username OR correo = p_Correo)
+        AND id_usuario <> p_Id_Usuario
+    ) THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El nombre de usuario o correo ya existe.';
     ELSE
-    BEGIN
-        -- Verificar si hay diferencias con los datos actuales
-        IF EXISTS(SELECT 1 FROM dbo.usuarios
-                  WHERE id_usuario = @Id_Usuario AND
-                        (nombre <> @NombreUsuario OR
-                         apellidos <> @Apellidos OR
-                         correo <> @Correo OR
-                         username <> @Username OR
-                         id_rol <> @Id_Rol ))
-        BEGIN
-            -- Solo actualiza si los datos son diferentes
-            UPDATE dbo.usuarios 
-            SET nombre = @NombreUsuario, 
-                apellidos = @Apellidos, 
-                correo = @Correo,
-                username = @Username,
-                id_rol = @Id_Rol
-            WHERE id_usuario = @Id_Usuario;
-
-        END
+        IF EXISTS (
+            SELECT 1 FROM usuarios
+            WHERE id_usuario = p_Id_Usuario AND (
+                nombre <> p_NombreUsuario OR
+                apellidos <> p_Apellidos OR
+                correo <> p_Correo OR
+                username <> p_Username OR
+                id_rol <> p_Id_Rol
+            )
+        ) THEN
+            UPDATE usuarios 
+            SET nombre = p_NombreUsuario, 
+                apellidos = p_Apellidos, 
+                correo = p_Correo,
+                username = p_Username,
+                id_rol = p_Id_Rol
+            WHERE id_usuario = p_Id_Usuario;
         ELSE
-        BEGIN
-            RAISERROR('No se realizaron cambios, los datos son iguales.', 0, 1);
-        END
-    END
-END
-GO
-/****** Object:  StoredProcedure [dbo].[CalcularPresupuesto]    Script Date: 20/06/2025 10:07:40 a. m. ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-CREATE PROCEDURE [dbo].[CalcularPresupuesto] 
-    @MONTO_TOTAL MONEY  
-AS
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'No se realizaron cambios, los datos son iguales.';
+        END IF;
+    END IF;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `CalcularPresupuesto` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `CalcularPresupuesto`(
+    IN p_MONTO_TOTAL DECIMAL(10,2)
+)
 BEGIN
-    DECLARE @SUMA_FACTORES FLOAT;
-    
-    IF OBJECT_ID('tempdb..#FamiliasTemp') IS NOT NULL
-        DROP TABLE #FamiliasTemp;
+    DECLARE v_SUMA_FACTORES DOUBLE;
 
-    CREATE TABLE #FamiliasTemp (
+    DROP TEMPORARY TABLE IF EXISTS FamiliasTemp;
+
+    CREATE TEMPORARY TABLE FamiliasTemp (
         ID_FAMILIA INT,
-        FACTOR FLOAT,
-        PRESUPUESTO MONEY
+        FACTOR DOUBLE
     );
 
-    INSERT INTO #FamiliasTemp (ID_FAMILIA, FACTOR)
+    INSERT INTO FamiliasTemp (ID_FAMILIA, FACTOR)
     SELECT 
         ID_FAMILIA,
-        (1.0 * cantidad_familiares) + (2.0 * CANTIDAD_NINOS) + 
+        (1.0 * cantidad_familiares) + 
+        (2.0 * cantidad_ninos) + 
         CASE id_vulnerabilidad 
             WHEN 1 THEN 3.0
             WHEN 2 THEN 2.0
             WHEN 3 THEN 1.0
             ELSE 1.0
-        END
+        END AS FACTOR
     FROM Familias;
 
-    SELECT @SUMA_FACTORES = SUM(FACTOR) FROM #FamiliasTemp;
+    SELECT SUM(FACTOR) INTO v_SUMA_FACTORES FROM FamiliasTemp;
 
-    IF @SUMA_FACTORES = 0
-    BEGIN
-        PRINT 'No hay familias registradas o no tienen factores válidos.';
-        RETURN;
-    END
+    IF v_SUMA_FACTORES = 0 THEN
+        SELECT 'No hay familias registradas o no tienen factores válidos.' AS mensaje;
+    ELSE
+        UPDATE Familias F
+        JOIN FamiliasTemp T ON F.ID_FAMILIA = T.ID_FAMILIA
+        SET F.presupuesto = (p_MONTO_TOTAL * T.FACTOR) / v_SUMA_FACTORES;
 
-    UPDATE F
-    SET F.PRESUPUESTO = (@MONTO_TOTAL * T.FACTOR) / @SUMA_FACTORES
-    FROM Familias F
-    INNER JOIN #FamiliasTemp T ON F.ID_FAMILIA = T.ID_FAMILIA;
+        SELECT 'Presupuesto calculado y actualizado proporcionalmente.' AS mensaje;
+    END IF;
 
-    PRINT 'Presupuesto calculado y actualizado proporcionalmente.';
-END;
-GO
-/****** Object:  StoredProcedure [dbo].[DescargarArchivo]    Script Date: 20/06/2025 10:07:40 a. m. ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-
-CREATE PROCEDURE [dbo].[DescargarArchivo]
-	@Id_Archivo BIGINT
-AS
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `EliminarEvento` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `EliminarEvento`(
+    IN p_Id_Evento BIGINT
+)
 BEGIN
-
-	SELECT Nombre,
-		   Ruta,
-		   Tipo
-	FROM Expedientes
-	WHERE Id_Archivo = @Id_Archivo
-END
-GO
-/****** Object:  StoredProcedure [dbo].[EliminarEvento]    Script Date: 20/06/2025 10:07:40 a. m. ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-
-CREATE PROCEDURE [dbo].[EliminarEvento]
-	@Id_Evento bigint
-AS
+    DELETE FROM Eventos
+    WHERE Id_Evento = p_Id_Evento;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `EliminarFamilia` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `EliminarFamilia`(
+    IN p_Id_Familia BIGINT
+)
 BEGIN
-	
-	DELETE FROM Eventos
-	WHERE Id_Evento = @Id_Evento
-
-END
-GO
-/****** Object:  StoredProcedure [dbo].[EliminarFamilia]    Script Date: 20/06/2025 10:07:40 a. m. ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-
-CREATE PROCEDURE [dbo].[EliminarFamilia]
-	@Id_Familia bigint
-AS
+    DELETE FROM familias
+    WHERE id_familia = p_Id_Familia;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `EliminarProducto` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `EliminarProducto`(
+    IN p_Id_Inventario INT
+)
 BEGIN
-	
-	DELETE FROM familias
-	WHERE id_familia = @Id_Familia
-
-END
-GO
-/****** Object:  StoredProcedure [dbo].[EliminarProducto]    Script Date: 20/06/2025 10:07:40 a. m. ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-
-CREATE PROCEDURE [dbo].[EliminarProducto]
-	@Id_Inventario INT
-AS
+    DELETE FROM inventario
+    WHERE id_inventario = p_Id_Inventario;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `EliminarUsuario` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `EliminarUsuario`(
+    IN p_Id_Usuario BIGINT
+)
 BEGIN
-	
-	DELETE FROM inventario
-	WHERE id_inventario = @Id_Inventario
-
-END
-GO
-/****** Object:  StoredProcedure [dbo].[EliminarUsuario]    Script Date: 20/06/2025 10:07:40 a. m. ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-
-CREATE PROCEDURE [dbo].[EliminarUsuario]
-	@Id_Usuario bigint
-AS
+    DELETE FROM usuarios
+    WHERE id_usuario = p_Id_Usuario;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `IniciarSesion` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `IniciarSesion`(
+    IN Username VARCHAR(100),
+    IN p_password VARCHAR(100)
+)
 BEGIN
-	
-	DELETE FROM usuarios
-	WHERE id_usuario = @Id_Usuario
-
-END
-GO
-/****** Object:  StoredProcedure [dbo].[IniciarSesion]    Script Date: 20/06/2025 10:07:40 a. m. ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-
-CREATE PROCEDURE [dbo].[IniciarSesion]
-	@Username nvarchar(100),
-	@password nvarchar(100)
-AS
+    SELECT
+        U.id_usuario,
+        U.Nombre AS NombreUsuario,
+        U.apellidos,
+        r.nombre AS NombreRol,
+        U.Correo,
+        U.Id_EstadoRegistro,
+        U.username,
+        U.password_temp_status
+    FROM usuarios U
+    JOIN rol r ON U.id_rol = r.id_rol
+    WHERE U.username = Username
+      AND U.password = p_password;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `MostrarEventos` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `MostrarEventos`(
+    IN p_Id_Evento BIGINT
+)
 BEGIN
-	
-	SELECT	U.id_usuario,
-			U.Nombre 'NombreUsuario',
-			apellidos,
-			r.nombre as 'NombreRol',
-			Correo,
-			Id_EstadoRegistro,
-			username,
-			password_temp_status
-	FROM	dbo.usuarios U
-	JOIN dbo.rol r  ON U.id_rol = r.id_rol
-	WHERE   username = @Username
-		AND password = @password
+    IF p_Id_Evento = 0 THEN
+        SET p_Id_Evento = NULL;
+    END IF;
 
-END
-GO
-/****** Object:  StoredProcedure [dbo].[MostrarEventos]    Script Date: 20/06/2025 10:07:40 a. m. ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-
-CREATE PROCEDURE [dbo].[MostrarEventos]
-	@Id_Evento BIGINT
-AS
+    SELECT *
+    FROM Eventos
+    WHERE Id_Evento = COALESCE(p_Id_Evento, Id_Evento);
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `ObtenerCategorias` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `ObtenerCategorias`()
 BEGIN
-
-	IF(@Id_Evento = 0)
-		SET @Id_Evento = NULL
-
-	SELECT *
-	FROM Eventos
-	WHERE  Id_Evento= ISNULL(@Id_Evento,Id_Evento)
-
-
-END
-GO
-/****** Object:  StoredProcedure [dbo].[ObtenerCategorias]    Script Date: 20/06/2025 10:07:40 a. m. ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-
-CREATE PROCEDURE [dbo].[ObtenerCategorias]
-AS
+    SELECT id_categoria, nombre
+    FROM categoria;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `ObtenerCorreoById` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `ObtenerCorreoById`(
+    IN p_Id_usuario BIGINT
+)
 BEGIN
-
-	
-
-	SELECT id_categoria, nombre
-	FROM categoria
-
-
-END
-GO
-/****** Object:  StoredProcedure [dbo].[ObtenerCorreoById]    Script Date: 20/06/2025 10:07:40 a. m. ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-
-CREATE PROCEDURE [dbo].[ObtenerCorreoById]
-	@Id_usuario bigint
-AS
-BEGIN
-	SELECT correo
-	FROM usuarios
-	WHERE id_usuario = @Id_usuario
-END
-GO
-/****** Object:  StoredProcedure [dbo].[ObtenerCorreosSeleccionados]    Script Date: 20/06/2025 10:07:40 a. m. ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-CREATE PROCEDURE [dbo].[ObtenerCorreosSeleccionados]
-    @CorreoLogueado NVARCHAR(100),
-    @Filtro NVARCHAR(100) = NULL
-AS
+    SELECT correo
+    FROM usuarios
+    WHERE id_usuario = p_Id_usuario;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `ObtenerCorreosSeleccionados` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `ObtenerCorreosSeleccionados`(
+    IN p_CorreoLogueado VARCHAR(100),
+    IN p_Filtro VARCHAR(100)
+)
 BEGIN
     SELECT nombre, correo
     FROM usuarios
-    WHERE correo != @CorreoLogueado
-      AND (@Filtro IS NULL OR nombre LIKE '%' + @Filtro + '%')
-END
-GO
-/****** Object:  StoredProcedure [dbo].[ObtenerEstados]    Script Date: 20/06/2025 10:07:40 a. m. ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-
-CREATE PROCEDURE [dbo].[ObtenerEstados]
-AS
+    WHERE correo != p_CorreoLogueado
+      AND (p_Filtro IS NULL OR nombre LIKE CONCAT('%', p_Filtro, '%'));
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `ObtenerEstados` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `ObtenerEstados`()
 BEGIN
-
-	
-
-	SELECT Id_EstadoRegistro, Nombre
-	FROM EstadoRegistro
-
-
-END
-GO
-/****** Object:  StoredProcedure [dbo].[ObtenerExpedientes]    Script Date: 20/06/2025 10:07:40 a. m. ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-
-CREATE PROCEDURE [dbo].[ObtenerExpedientes]
- @Id_Expediente BIGINT
-AS
+    SELECT Id_EstadoRegistro, Nombre FROM EstadoRegistro;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `ObtenerExpedientes` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `ObtenerExpedientes`(
+    IN p_Id_Expediente BIGINT
+)
 BEGIN
-	IF NOT EXISTS(SELECT 1 FROM dbo.Expedientes 
-              WHERE Id_Archivo = @Id_Expediente)
-    BEGIN
-        RAISERROR('Expediente no encontrado.', 16, 1);
-    END
-	ELSE
-	BEGIN
-		IF(@Id_Expediente = 0)
-			SET @Id_Expediente = NULL
-	
-		SELECT	E.Id_Archivo,
-				E.Nombre,
-				E.FechaSubida,
-				E.Id_Familia,
-				F.nombre_representante 'NombreRepresentante'
-		FROM	dbo.Expedientes E
-		INNER	JOIN dbo.familias F ON E.Id_Familia = F.id_familia
-		WHERE  Id_Archivo= ISNULL(@Id_Expediente,Id_Archivo)
-	END
-END
-GO
-/****** Object:  StoredProcedure [dbo].[ObtenerFamilias]    Script Date: 20/06/2025 10:07:40 a. m. ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
+    DECLARE v_exist INT DEFAULT 0;
 
-CREATE PROCEDURE [dbo].[ObtenerFamilias]
- @Id_Familia BIGINT
-AS
-BEGIN
+    SELECT COUNT(*) INTO v_exist FROM Expedientes WHERE Id_Archivo = p_Id_Expediente;
 
-	IF(@Id_Familia = 0)
-		SET @Id_Familia = NULL
-	
-	SELECT	F.id_familia,
-			F.nombre_representante,
-			F.cedula_representante,
-			F.direccion,
-			F.telefono,
-			F.cantidad_familiares,
-			F.cantidad_ninos,
-			F.presupuesto,
-			F.id_vulnerabilidad,
-			V.nombre 'Nombre_Vulnerabilidad',
-			F.presupuesto
-	FROM	dbo.familias F
-	INNER	JOIN dbo.vulnerabilidad V ON F.id_vulnerabilidad = V.id_vulnerabilidad
-	WHERE  id_familia= ISNULL(@Id_Familia,id_familia)
-
-END
-GO
-/****** Object:  StoredProcedure [dbo].[ObtenerProductos]    Script Date: 20/06/2025 10:07:40 a. m. ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-
-CREATE PROCEDURE [dbo].[ObtenerProductos]
- @Id_Inventario BIGINT
-AS
-BEGIN
-
-	IF(@Id_Inventario = 0)
-		SET @Id_Inventario = NULL
-	
-	SELECT id_inventario,	
-		   I.nombre 'NombreProducto',
-		   stock,
-		   I.id_categoria,
-		   C.nombre as 'NombreCategoria',
-		   C.descripcion
-	FROM inventario I
-	JOIN categoria C ON I.id_categoria = C.id_categoria
-	WHERE  id_inventario= ISNULL(@Id_Inventario,id_inventario)
-
-END
-GO
-/****** Object:  StoredProcedure [dbo].[ObtenerRoles]    Script Date: 20/06/2025 10:07:40 a. m. ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-
-CREATE PROCEDURE [dbo].[ObtenerRoles]
-AS
-BEGIN
-
-	
-
-	SELECT *
-	FROM rol
-
-
-END
-GO
-/****** Object:  StoredProcedure [dbo].[ObtenerUsuarios]    Script Date: 20/06/2025 10:07:40 a. m. ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-
-CREATE PROCEDURE [dbo].[ObtenerUsuarios]
- @Id_usuario BIGINT
-AS
-BEGIN
-
-	IF(@Id_usuario = 0)
-		SET @Id_usuario = NULL
-	
-	SELECT	U.id_usuario,
-			U.Nombre 'NombreUsuario',
-			U.apellidos,
-			U.username,
-			Correo,
-			U.id_rol,
-			E.Id_EstadoRegistro,
-			E.Nombre 'NombreEstadoRegistro',
-			R.nombre 'NombreRol'
-	FROM	dbo.usuarios U
-	INNER	JOIN dbo.rol R ON U.id_rol = R.id_rol
-	JOIN dbo.EstadoRegistro E ON U.Id_EstadoRegistro = E.Id_EstadoRegistro
-	WHERE  id_usuario= ISNULL(@Id_usuario,id_usuario)
-
-END
-GO
-/****** Object:  StoredProcedure [dbo].[ObtenerUsuariosEspera]    Script Date: 20/06/2025 10:07:40 a. m. ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-
-CREATE PROCEDURE [dbo].[ObtenerUsuariosEspera]
- @Id_usuario BIGINT
-AS
-BEGIN
-
-	IF(@Id_usuario = 0)
-		SET @Id_usuario = NULL
-	
-	SELECT	U.id_usuario,
-			U.Nombre 'NombreUsuario',
-			U.apellidos,
-			U.username,
-			Correo,
-			U.id_rol,
-			E.Id_EstadoRegistro,
-			E.Nombre 'NombreEstadoRegistro',
-			R.nombre 'NombreRol'
-	FROM	dbo.usuarios U
-	INNER	JOIN dbo.rol R ON U.id_rol = R.id_rol
-	JOIN dbo.EstadoRegistro E ON U.Id_EstadoRegistro = E.Id_EstadoRegistro
-	WHERE  id_usuario != @Id_usuario
-	AND u.Id_EstadoRegistro = 3
-
-END
-GO
-/****** Object:  StoredProcedure [dbo].[ObtenerVoluntarios]    Script Date: 20/06/2025 10:07:40 a. m. ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-
-CREATE PROCEDURE [dbo].[ObtenerVoluntarios]
- @Id_usuario BIGINT
-AS
-BEGIN
-
-	IF(@Id_usuario = 0)
-		SET @Id_usuario = NULL
-	
-	SELECT	U.id_usuario,
-			U.Nombre 'NombreUsuario',
-			U.apellidos,
-			U.username,
-			Correo,
-			U.id_rol,
-			E.Id_EstadoRegistro,
-			E.Nombre 'NombreEstadoRegistro',
-			R.nombre 'NombreRol'
-	FROM	dbo.usuarios U
-	INNER	JOIN dbo.rol R ON U.id_rol = R.id_rol
-	JOIN dbo.EstadoRegistro E ON U.Id_EstadoRegistro = E.Id_EstadoRegistro
-	WHERE  id_usuario != @Id_usuario
-	AND u.Id_EstadoRegistro = 1
-
-END
-GO
-/****** Object:  StoredProcedure [dbo].[ObtenerVulnerabilidad]    Script Date: 20/06/2025 10:07:40 a. m. ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-
-CREATE PROCEDURE [dbo].[ObtenerVulnerabilidad]
-AS
-BEGIN
-
-	
-
-	SELECT id_vulnerabilidad,nombre
-	FROM vulnerabilidad
-
-
-END
-GO
-/****** Object:  StoredProcedure [dbo].[RecuperarContrasenna]    Script Date: 20/06/2025 10:07:40 a. m. ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-CREATE PROCEDURE [dbo].[RecuperarContrasenna]
-	@Id_usuario bigint,
-	@Contrasenna varchar(50),
-	@ContrasennaAnterior varchar(50),
-	@VencimientoContraTemp Datetime
-AS
-BEGIN
-	
-
-		UPDATE usuarios
-		SET password = @Contrasenna, password_temp_expiration = @VencimientoContraTemp, password_temp_status = 1
-		WHERE Id_Usuario = @Id_Usuario
-
-
-END
-GO
-/****** Object:  StoredProcedure [dbo].[RegistrarArchivo]    Script Date: 20/06/2025 10:07:40 a. m. ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-
-CREATE PROCEDURE [dbo].[RegistrarArchivo]
-	 @Nombre NVARCHAR(255),
-    @Tipo NVARCHAR(100),
-    @Ruta NVARCHAR(500),
-	@Id_Familia bigint
-AS
-BEGIN
-	
-	 IF NOT EXISTS(SELECT 1 FROM dbo.familias 
-              WHERE id_familia = @Id_Familia)
-    BEGIN
-        RAISERROR('Familia no encontrada.', 16, 1);
-    END
+    IF v_exist = 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Expediente no encontrado.';
     ELSE
-    BEGIN
-       INSERT INTO dbo.Expedientes (Nombre, Tipo, Ruta, FechaSubida,Id_Familia)
-		VALUES (@Nombre, @Tipo, @Ruta,GETDATE(),@Id_Familia);
-    END
+        IF p_Id_Expediente = 0 THEN
+            SET p_Id_Expediente = NULL;
+        END IF;
 
-	
-
-END
-GO
-/****** Object:  StoredProcedure [dbo].[RegistrarEvento]    Script Date: 20/06/2025 10:07:40 a. m. ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-CREATE PROCEDURE [dbo].[RegistrarEvento]
-	@Nombre_Evento varchar(50),
-	@Descripcion text,
-	@Fecha_Inicio datetime,
-	@Fecha_Final datetime,
-	@Color varchar(7),
-	@invitados text
-AS
+        SELECT 
+            E.Id_Archivo,
+            E.Nombre,
+            E.FechaSubida,
+            E.Id_Familia,
+            F.nombre_representante AS NombreRepresentante
+        FROM Expedientes E
+        INNER JOIN familias F ON E.Id_Familia = F.id_familia
+        WHERE E.Id_Archivo = COALESCE(p_Id_Expediente, E.Id_Archivo);
+    END IF;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `ObtenerFamilias` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `ObtenerFamilias`(
+    IN p_Id_Familia BIGINT
+)
 BEGIN
-    INSERT INTO dbo.Eventos (Nombre_Evento, Descripcion, Fecha_Inicio, Fecha_Final, Color, Invitados)
-    VALUES (@Nombre_Evento, @Descripcion, @Fecha_Inicio, @Fecha_Final, @Color, @invitados)
-END
-GO
-/****** Object:  StoredProcedure [dbo].[RegistrarFamilia]    Script Date: 20/06/2025 10:07:40 a. m. ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
+    IF p_Id_Familia = 0 THEN
+        SET p_Id_Familia = NULL;
+    END IF;
 
-CREATE PROCEDURE [dbo].[RegistrarFamilia]
-    @Nombre_Representante nvarchar(100),
-    @Cedula_Representante varchar(100),
-    @Direccion nvarchar(255),
-    @Telefono varchar(8),
-    @Cantidad_Familiares int,
-	@Cantidad_Ninos int,
-	@Id_Vulnerabilidad int
-AS
+    SELECT
+        F.id_familia,
+        F.nombre_representante,
+        F.cedula_representante,
+        F.direccion,
+        F.telefono,
+        F.cantidad_familiares,
+        F.cantidad_ninos,
+        F.presupuesto,
+        F.id_vulnerabilidad,
+        V.nombre AS Nombre_Vulnerabilidad,
+        F.presupuesto
+    FROM familias F
+    INNER JOIN vulnerabilidad V ON F.id_vulnerabilidad = V.id_vulnerabilidad
+    WHERE F.id_familia = COALESCE(p_Id_Familia, F.id_familia);
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `ObtenerProductos` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `ObtenerProductos`(
+    IN p_Id_Inventario BIGINT
+)
 BEGIN
+    IF p_Id_Inventario = 0 THEN
+        SET p_Id_Inventario = NULL;
+    END IF;
 
-    IF EXISTS(SELECT 1 FROM dbo.familias 
-              WHERE nombre_representante = @Nombre_Representante
-                 OR cedula_representante = @Cedula_Representante)
-    BEGIN
-        RAISERROR('El nombre del representante ya tiene una familia registrada.', 16, 1);
-    END
+    SELECT 
+        I.id_inventario,
+        I.nombre AS NombreProducto,
+        I.stock,
+        I.id_categoria,
+        C.nombre AS NombreCategoria,
+        C.descripcion
+    FROM inventario I
+    JOIN categoria C ON I.id_categoria = C.id_categoria
+    WHERE I.id_inventario = COALESCE(p_Id_Inventario, I.id_inventario);
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `ObtenerRoles` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `ObtenerRoles`()
+BEGIN
+    SELECT * FROM rol;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `ObtenerUsuarios` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `ObtenerUsuarios`(IN p_Id_usuario BIGINT)
+BEGIN
+    IF p_Id_usuario = 0 THEN
+        SET p_Id_usuario = NULL;
+    END IF;
+
+    SELECT  
+        U.id_usuario,
+        U.Nombre AS NombreUsuario,
+        U.apellidos,
+        U.username,
+        U.Correo,
+        U.id_rol,
+        E.Id_EstadoRegistro,
+        E.Nombre AS NombreEstadoRegistro,
+        R.nombre AS NombreRol
+    FROM usuarios U
+    INNER JOIN rol R ON U.id_rol = R.id_rol
+    INNER JOIN EstadoRegistro E ON U.Id_EstadoRegistro = E.Id_EstadoRegistro
+    WHERE U.id_usuario = COALESCE(p_Id_usuario, U.id_usuario);
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `ObtenerUsuariosEspera` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `ObtenerUsuariosEspera`(IN p_Id_usuario BIGINT)
+BEGIN
+    IF p_Id_usuario = 0 THEN
+        SET p_Id_usuario = NULL;
+    END IF;
+
+    SELECT  
+        U.id_usuario,
+        U.Nombre AS NombreUsuario,
+        U.apellidos,
+        U.username,
+        U.Correo,
+        U.id_rol,
+        E.Id_EstadoRegistro,
+        U.Telefono,
+        E.Nombre AS NombreEstadoRegistro,
+        R.nombre AS NombreRol
+    FROM usuarios U
+    INNER JOIN rol R ON U.id_rol = R.id_rol
+    INNER JOIN EstadoRegistro E ON U.Id_EstadoRegistro = E.Id_EstadoRegistro
+    WHERE U.id_usuario != p_Id_usuario
+      AND U.Id_EstadoRegistro = 3;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `ObtenerVoluntarios` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `ObtenerVoluntarios`(IN p_Id_usuario BIGINT)
+BEGIN
+    IF p_Id_usuario = 0 THEN
+        SET p_Id_usuario = NULL;
+    END IF;
+
+    SELECT  
+        U.id_usuario,
+        U.Nombre AS NombreUsuario,
+        U.apellidos,
+        U.username,
+        U.Correo,
+        U.id_rol,
+        E.Id_EstadoRegistro,
+        E.Nombre AS NombreEstadoRegistro,
+        R.nombre AS NombreRol
+    FROM usuarios U
+    INNER JOIN rol R ON U.id_rol = R.id_rol
+    INNER JOIN EstadoRegistro E ON U.Id_EstadoRegistro = E.Id_EstadoRegistro
+    WHERE U.id_usuario != p_Id_usuario
+      AND U.Id_EstadoRegistro = 1;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `ObtenerVulnerabilidad` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `ObtenerVulnerabilidad`()
+BEGIN
+    SELECT id_vulnerabilidad, nombre FROM vulnerabilidad;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `RecuperarContrasenna` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `RecuperarContrasenna`(
+    IN p_Id_usuario BIGINT,
+    IN p_Contrasenna VARCHAR(50),
+    IN p_ContrasennaAnterior VARCHAR(50),
+    IN p_VencimientoContraTemp DATETIME
+)
+BEGIN
+    UPDATE usuarios
+    SET password = p_Contrasenna,
+        password_temp_expiration = p_VencimientoContraTemp,
+        password_temp_status = 1
+    WHERE id_usuario = p_Id_usuario;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `RegistrarArchivo` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `RegistrarArchivo`(
+    IN p_Nombre VARCHAR(255),
+    IN p_Tipo VARCHAR(100),
+    IN p_Ruta VARCHAR(500),
+    IN p_Id_Familia BIGINT
+)
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM familias WHERE id_familia = p_Id_Familia) THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Familia no encontrada.';
     ELSE
-    BEGIN
-        INSERT INTO dbo.familias(nombre_representante, cedula_representante, direccion, telefono, cantidad_familiares, cantidad_ninos, id_vulnerabilidad)
-        VALUES (@Nombre_Representante, @Cedula_Representante, @Direccion, @Telefono, @Cantidad_Familiares, @Cantidad_Ninos, @Id_Vulnerabilidad)
-    END
-
-END
-GO
-/****** Object:  StoredProcedure [dbo].[RegistrarProducto]    Script Date: 20/06/2025 10:07:40 a. m. ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-
-CREATE PROCEDURE [dbo].[RegistrarProducto]
-    @NombreProducto nvarchar(100),
-	@Id_Categoria INT ,
-    @stock INT
-AS
+        INSERT INTO Expedientes (Nombre, Tipo, Ruta, FechaSubida, Id_Familia)
+        VALUES (p_Nombre, p_Tipo, p_Ruta, NOW(), p_Id_Familia);
+    END IF;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `RegistrarEvento` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `RegistrarEvento`(
+    IN p_Nombre_Evento VARCHAR(50),
+    IN p_Descripcion TEXT,
+    IN p_Fecha_Inicio DATETIME,
+    IN p_Fecha_Final DATETIME,
+    IN p_Color VARCHAR(7),
+    IN p_invitados TEXT
+)
 BEGIN
-
-    IF EXISTS(SELECT 1 FROM dbo.inventario 
-              WHERE nombre = @NombreProducto)
-    BEGIN
-        RAISERROR('Este producto ya esta registrado.', 16, 1);
-    END
+    INSERT INTO Eventos (Nombre_Evento, Descripcion, Fecha_Inicio, Fecha_Final, Color, Invitados)
+    VALUES (p_Nombre_Evento, p_Descripcion, p_Fecha_Inicio, p_Fecha_Final, p_Color, p_invitados);
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `RegistrarFamilia` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `RegistrarFamilia`(
+    IN p_Nombre_Representante VARCHAR(100),
+    IN p_Cedula_Representante VARCHAR(100),
+    IN p_Direccion VARCHAR(255),
+    IN p_Telefono VARCHAR(8),
+    IN p_Cantidad_Familiares INT,
+    IN p_Cantidad_Ninos INT,
+    IN p_Id_Vulnerabilidad INT
+)
+BEGIN
+    IF EXISTS (
+        SELECT 1 FROM familias 
+        WHERE nombre_representante = p_Nombre_Representante
+           OR cedula_representante = p_Cedula_Representante
+    ) THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El nombre del representante ya tiene una familia registrada.';
     ELSE
-    BEGIN
-        INSERT INTO dbo.inventario(nombre,id_categoria,stock)
-        VALUES (@NombreProducto,@Id_Categoria, @stock)
-    END
-
-END
-GO
-/****** Object:  StoredProcedure [dbo].[RegistrarUsuario]    Script Date: 20/06/2025 10:07:40 a. m. ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-
-CREATE PROCEDURE [dbo].[RegistrarUsuario]
-    @NombreUsuario nvarchar(100),
-	@Cedula varchar(50) ,
-    @Apellidos nvarchar(100),
-    @Correo nvarchar(100),
-    @Username nvarchar(100),
-    @Password nvarchar(100)
-AS
+        INSERT INTO familias(
+            nombre_representante, cedula_representante, direccion, telefono, 
+            cantidad_familiares, cantidad_ninos, id_vulnerabilidad)
+        VALUES (
+            p_Nombre_Representante, p_Cedula_Representante, p_Direccion, p_Telefono, 
+            p_Cantidad_Familiares, p_Cantidad_Ninos, p_Id_Vulnerabilidad
+        );
+    END IF;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `RegistrarProducto` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `RegistrarProducto`(
+    IN p_NombreProducto VARCHAR(100),
+    IN p_Id_Categoria INT,
+    IN p_stock INT
+)
 BEGIN
-
-    IF EXISTS(SELECT 1 FROM dbo.usuarios 
-              WHERE Cedula = @Cedula
-                 OR Correo = @Correo)
-    BEGIN
-        RAISERROR('La cedula o correo ya existe.', 16, 1);
-    END
+    IF EXISTS (SELECT 1 FROM inventario WHERE nombre = p_NombreProducto) THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Este producto ya esta registrado.';
     ELSE
-    BEGIN
-        INSERT INTO dbo.usuarios(nombre,cedula,apellidos, Correo, username, password, id_rol, fecha_registro, password_temp_status, password_temp_expiration,Id_EstadoRegistro)
-        VALUES (@NombreUsuario,@Cedula, @Apellidos, @Correo, @Username, @Password, 2, GETDATE(), 0, NULL,3)
-    END
-
-END
-GO
-/****** Object:  StoredProcedure [dbo].[VerificarCorreo]    Script Date: 20/06/2025 10:07:40 a. m. ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-
-CREATE PROCEDURE [dbo].[VerificarCorreo]
-	@Correo nvarchar(100)
-AS
+        INSERT INTO inventario(nombre, id_categoria, stock)
+        VALUES (p_NombreProducto, p_Id_Categoria, p_stock);
+    END IF;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `RegistrarUsuario` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `RegistrarUsuario`(
+    IN p_NombreUsuario VARCHAR(100),
+    IN p_Cedula VARCHAR(50),
+    IN p_Apellidos VARCHAR(100),
+    IN p_Correo VARCHAR(100),
+    IN p_Username VARCHAR(100),
+    IN p_Password VARCHAR(100),
+    IN p_Telefono INT
+)
 BEGIN
-	
-	SELECT	U.id_usuario,
-			U.Nombre 'NombreUsuario',
-			apellidos,
-			r.nombre as 'NombreRol',
-			Correo,
-			Cedula,
-			username,
-			E.Nombre 'NombreEstadoRegistro'
-	FROM	dbo.EstadoRegistro E
-	JOIN dbo.usuarios U ON E.Id_EstadoRegistro = U.Id_EstadoRegistro
-	JOIN dbo.rol r  ON U.id_rol = r.id_rol
-	WHERE   correo = @Correo
-
-END
-GO
-/****** Object:  StoredProcedure [dbo].[VerificarIsVoluntario]    Script Date: 20/06/2025 10:07:40 a. m. ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-
-CREATE PROCEDURE [dbo].[VerificarIsVoluntario]
-	@Cedula nvarchar(100)
-AS
+    IF EXISTS (
+        SELECT 1 FROM usuarios
+        WHERE Cedula = p_Cedula
+           OR Correo = p_Correo
+    ) THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'La cedula o correo ya existe.';
+    ELSE
+        INSERT INTO usuarios(
+            nombre, cedula, apellidos, Correo, username, password, 
+            id_rol, fecha_registro, password_temp_status, password_temp_expiration, Id_EstadoRegistro, telefono
+        )
+        VALUES (
+            p_NombreUsuario, p_Cedula, p_Apellidos, p_Correo, p_Username, p_Password, 
+            2, NOW(), 0, NULL, 3, p_Telefono
+        );
+    END IF;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `VerificarCorreo` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `VerificarCorreo`(
+    IN p_Correo VARCHAR(100)
+)
 BEGIN
-	
-	SELECT	U.id_usuario,
-			U.Nombre 'NombreUsuario',
-			apellidos,
-			r.nombre as 'NombreRol',
-			Correo,
-			U.Cedula
-			username,
-			E.Nombre 'NombreEstadoRegistro'
-	FROM	dbo.EstadoRegistro E
-	JOIN dbo.usuarios U ON E.Id_EstadoRegistro = U.Id_EstadoRegistro
-	JOIN dbo.rol r  ON U.id_rol = r.id_rol
-	WHERE   Cedula = @Cedula
+    SELECT  U.id_usuario,
+            U.Nombre AS NombreUsuario,
+            U.apellidos,
+            r.nombre AS NombreRol,
+            U.Correo,
+            U.Cedula,
+            U.username,
+            E.Nombre AS NombreEstadoRegistro
+    FROM EstadoRegistro E
+    JOIN usuarios U ON E.Id_EstadoRegistro = U.Id_EstadoRegistro
+    JOIN rol r ON U.id_rol = r.id_rol
+    WHERE U.Correo = p_Correo;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `VerificarIsVoluntario` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `VerificarIsVoluntario`(
+    IN p_Cedula VARCHAR(100)
+)
+BEGIN
+    SELECT  U.id_usuario,
+            U.Nombre AS NombreUsuario,
+            U.apellidos,
+            r.nombre AS NombreRol,
+            U.Correo,
+            U.Cedula,
+            U.username,
+            E.Nombre AS NombreEstadoRegistro
+    FROM EstadoRegistro E
+    JOIN usuarios U ON E.Id_EstadoRegistro = U.Id_EstadoRegistro
+    JOIN rol r ON U.id_rol = r.id_rol
+    WHERE U.Cedula = p_Cedula;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
-END
-GO
-USE [master]
-GO
-ALTER DATABASE [AbrazosDB] SET  READ_WRITE 
-GO
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2025-06-20 14:00:33

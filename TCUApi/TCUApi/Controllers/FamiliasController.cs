@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.SqlClient;
+using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
 using System.Data;
 using System.Text;
@@ -37,11 +37,11 @@ namespace TCUApi.Controllers
 
                
 
-                using (var connection = new SqlConnection(_configuration.GetSection("ConnectionStrings:AbrazosDBConnection").Value))
+                using (var connection = new MySqlConnection(_configuration.GetSection("ConnectionStrings:AbrazosDBConnection").Value))
                 {
                     await connection.OpenAsync();
 
-                    var isVoluntario = await connection.QueryAsync("VerificarIsVoluntario",new { Cedula =model.cedula_representante },commandType: CommandType.StoredProcedure);
+                    var isVoluntario = await connection.QueryAsync("VerificarIsVoluntario",new { p_Cedula =model.cedula_representante },commandType: CommandType.StoredProcedure);
 
                     if(isVoluntario.Any())
                     {
@@ -52,13 +52,13 @@ namespace TCUApi.Controllers
 
                     var result = await connection.ExecuteAsync("RegistrarFamilia", new
                     {
-                        model.cedula_representante,
-                        model.Nombre_Representante,
-                        model.direccion,
-                        model.telefono,
-                        model.cantidad_familiares,
-                        model.cantidad_ninos,
-                        model.Id_Vulnerabilidad
+                        p_Nombre_Representante = model.Nombre_Representante,
+                        p_Cedula_Representante = model.cedula_representante,
+                        p_Direccion = model.direccion,
+                        p_Telefono = model.telefono,
+                        p_Cantidad_Familiares = model.cantidad_familiares,
+                        p_Cantidad_Ninos = model.cantidad_ninos,
+                        p_Id_Vulnerabilidad = model.Id_Vulnerabilidad
                     }, commandType: CommandType.StoredProcedure);
 
                     respuesta.Indicador = result > 0;
@@ -88,18 +88,20 @@ namespace TCUApi.Controllers
 
                
 
-                using (var connection = new SqlConnection(_configuration.GetSection("ConnectionStrings:AbrazosDBConnection").Value))
+                using (var connection = new MySqlConnection(_configuration.GetSection("ConnectionStrings:AbrazosDBConnection").Value))
                 {
+                    connection.Open();
+
                     var result = connection.Execute("ActualizarFamilia", new
                     {
-                        model.Id_Familia,
-                        model.Nombre_Representante,
-                        model.cedula_representante,
-                        model.direccion,
-                        model.telefono,
-                        model.cantidad_familiares,
-                        model.cantidad_ninos,
-                        model.Id_Vulnerabilidad
+                        p_Id_Familia = model.Id_Familia,
+                        p_Nombre_Representante = model.cedula_representante,
+                        p_Cedula_Representante = model.Nombre_Representante,
+                        p_Direccion = model.direccion,
+                        p_Telefono = model.telefono,
+                        p_Cantidad_Familiares = model.cantidad_familiares,
+                        p_Cantidad_Ninos = model.cantidad_ninos,
+                        p_Id_Vulnerabilidad = model.Id_Vulnerabilidad
                     }, commandType: CommandType.StoredProcedure);
 
                     respuesta.Indicador = result > 0;
@@ -129,9 +131,11 @@ namespace TCUApi.Controllers
                     return Unauthorized(new { mensaje = "No tiene permisos para eliminar usuarios" });
                 }
 
-                using (var context = new SqlConnection(_configuration.GetConnectionString("AbrazosDBConnection")))
+                using (var context = new MySqlConnection(_configuration.GetConnectionString("AbrazosDBConnection")))
                 {
-                    var result = context.Execute("EliminarFamilia", new { Id_Familia = id });
+                    context.Open();
+
+                    var result = context.Execute("EliminarFamilia", new { p_Id_Familia = id });
 
                     return Ok(new RespuestaModel
                     {
@@ -140,7 +144,7 @@ namespace TCUApi.Controllers
                     });
                 }
             }
-            catch (SqlException sqlEx)
+            catch (MySqlException sqlEx)
             {
                 return StatusCode(500, new { error = "Error en la base de datos", detalle = sqlEx.Message });
             }
@@ -160,13 +164,14 @@ namespace TCUApi.Controllers
                 {
                     return Unauthorized(new { mensaje = "No tiene permisos para realizar esta acción" });
                 }
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("AbrazosDBConnection")))
+                using (var connection = new MySqlConnection(_configuration.GetConnectionString("AbrazosDBConnection")))
                 {
-                    var result = connection.Query<FamiliasModel>("ObtenerFamilias", new { Id_Familia = 0 }, commandType: CommandType.StoredProcedure).ToList();
+                    connection.Open();  
+                    var result = connection.Query<FamiliasModel>("ObtenerFamilias", new { p_Id_Familia = 0 }, commandType: CommandType.StoredProcedure).ToList();
                     return Ok(new RespuestaModel { Indicador = true, Datos = result });
                 }
             }
-            catch (SqlException sqlEx)
+            catch (MySqlException sqlEx)
             {
                 return StatusCode(500, new { error = "Error en la base de datos", detalle = sqlEx.Message });
             }
@@ -185,13 +190,14 @@ namespace TCUApi.Controllers
             try
             {
 
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("AbrazosDBConnection")))
+                using (var connection = new MySqlConnection(_configuration.GetConnectionString("AbrazosDBConnection")))
                 {
-                    var result = connection.Query<FamiliasModel>("ObtenerFamilias", new { Id_Familia = id }, commandType: CommandType.StoredProcedure).ToList();
+                    connection.Open();
+                    var result = connection.Query<FamiliasModel>("ObtenerFamilias", new { p_Id_Familia = id }, commandType: CommandType.StoredProcedure).ToList();
                     return Ok(new RespuestaModel { Indicador = true, Datos = result });
                 }
             }
-            catch (SqlException sqlEx)
+            catch (MySqlException sqlEx)
             {
                 return StatusCode(500, new { error = "Error en la base de datos", detalle = sqlEx.Message });
             }
@@ -210,8 +216,9 @@ namespace TCUApi.Controllers
             try
             {
 
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("AbrazosDBConnection")))
+                using (var connection = new MySqlConnection(_configuration.GetConnectionString("AbrazosDBConnection")))
                 {
+                    connection.Open();
                     var result = connection.Query<VulnerabilidadModel>("ObtenerVulnerabilidad", commandType: CommandType.StoredProcedure).ToList();
 
                     var vulnerabilidades = result.Select(vulnerabilidad => new
@@ -223,7 +230,7 @@ namespace TCUApi.Controllers
                     return Ok(new RespuestaModel { Indicador = true, Datos = result });
                 }
             }
-            catch (SqlException sqlEx)
+            catch (MySqlException sqlEx)
             {
                 return StatusCode(500, new { error = "Error en la base de datos", detalle = sqlEx.Message });
             }

@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.SqlClient;
+using MySql.Data.MySqlClient;
 using System.Data;
 using System.Security.Cryptography;
 using System.Text;
@@ -45,16 +45,16 @@ namespace TCUApi.Controllers
                     return Unauthorized(new { mensaje = "No tiene permisos para actualizar usuarios" });
                 }
 
-                using (var context = new SqlConnection(_configuration.GetConnectionString("AbrazosDBConnection")))
+                using (var context = new MySqlConnection(_configuration.GetConnectionString("AbrazosDBConnection")))
                 {
                     var result = context.Execute("ActualizarUsuario", new
                     {
-                        model.Id_usuario,
-                        model.NombreUsuario,
-                        model.Apellidos,
-                        model.Correo,
-                        model.Username,
-                        model.Id_Rol,
+                        p_Id_Usuario = model.Id_usuario,
+                        p_NombreUsuario = model.NombreUsuario,
+                        p_Apellidos = model.Apellidos,
+                        p_Correo = model.Correo,
+                        p_Username = model.Username,
+                        p_Id_Rol = model.Id_Rol,
                     });
 
                     return Ok(new RespuestaModel
@@ -64,9 +64,9 @@ namespace TCUApi.Controllers
                     });
                 }
             }
-            catch (SqlException sqlEx)
+            catch (MySqlException MySqlEx)
             {
-                return StatusCode(500, new { Indicador = false, Mensaje = sqlEx.Message });
+                return StatusCode(500, new { Indicador = false, Mensaje = MySqlEx.Message });
             }
             catch (Exception ex)
             {
@@ -87,9 +87,9 @@ namespace TCUApi.Controllers
                     return Unauthorized(new { mensaje = "No tiene permisos para eliminar usuarios" });
                 }
 
-                using (var context = new SqlConnection(_configuration.GetConnectionString("AbrazosDBConnection")))
+                using (var context = new MySqlConnection(_configuration.GetConnectionString("AbrazosDBConnection")))
                 {
-                    var result = context.Execute("EliminarUsuario", new { Id_Usuario = id });
+                    var result = context.Execute("EliminarUsuario", new { p_Id_Usuario = id });
 
                     return Ok(new RespuestaModel
                     {
@@ -98,9 +98,9 @@ namespace TCUApi.Controllers
                     });
                 }
             }
-            catch (SqlException sqlEx)
+            catch (MySqlException MySqlEx)
             {
-                return StatusCode(500, new { error = "Error en la base de datos", detalle = sqlEx.Message });
+                return StatusCode(500, new { error = "Error en la base de datos", detalle = MySqlEx.Message });
             }
             catch (Exception ex)
             {
@@ -120,15 +120,15 @@ namespace TCUApi.Controllers
                 {
                     return Unauthorized(new { mensaje = "No tiene permisos para realizar esta acción" });
                 }
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("AbrazosDBConnection")))
+                using (var connection = new MySqlConnection(_configuration.GetConnectionString("AbrazosDBConnection")))
                 {
-                    var result = connection.Query<UsuarioModel>("ObtenerVoluntarios", new { Id_usuario = idUsuario }, commandType: CommandType.StoredProcedure).ToList();
+                    var result = connection.Query<UsuarioModel>("ObtenerVoluntarios", new { p_Id_usuario = idUsuario }, commandType: CommandType.StoredProcedure).ToList();
                     return Ok(new RespuestaModel { Indicador = true, Datos = result });
                 }
             }
-            catch (SqlException sqlEx)
+            catch (MySqlException MySqlEx)
             {
-                return StatusCode(500, new { error = "Error en la base de datos", detalle = sqlEx.Message });
+                return StatusCode(500, new { error = "Error en la base de datos", detalle = MySqlEx.Message });
             }
             catch (Exception ex)
             {
@@ -145,15 +145,15 @@ namespace TCUApi.Controllers
             try
             {
 
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("AbrazosDBConnection")))
+                using (var connection = new MySqlConnection(_configuration.GetConnectionString("AbrazosDBConnection")))
                 {
-                    var result = connection.Query<UsuarioModel>("ObtenerUsuarios", new { Id_usuario = id }, commandType: CommandType.StoredProcedure).ToList();
+                    var result = connection.Query<UsuarioModel>("ObtenerUsuarios", new { p_Id_Usuario = id }, commandType: CommandType.StoredProcedure).ToList();
                     return Ok(new RespuestaModel { Indicador = true, Datos = result });
                 }
             }
-            catch (SqlException sqlEx)
+            catch (MySqlException MySqlEx)
             {
-                return StatusCode(500, new { error = "Error en la base de datos", detalle = sqlEx.Message });
+                return StatusCode(500, new { error = "Error en la base de datos", detalle = MySqlEx.Message });
             }
             catch (Exception ex)
             {
@@ -195,7 +195,7 @@ namespace TCUApi.Controllers
                 string encryptedPasswordOld = _general.Encrypt(model.OldPassword!);
                 long idUsuario = _general.ObtenerUsuarioFromToken(User.Claims);
 
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("AbrazosDBConnection")))
+                using (var connection = new MySqlConnection(_configuration.GetConnectionString("AbrazosDBConnection")))
                 {
                     connection.Open();
 
@@ -205,10 +205,10 @@ namespace TCUApi.Controllers
                             "ActualizarContrasenna",
                             new
                             {
-                                Id_usuario = idUsuario,
-                                Contrasena = encryptedPassword,
-                                ContrasennaAnterior = encryptedPasswordOld,
-                                ContrasennaConfirmar = encryptedPasswordConfirm,
+                                p_Id_usuario = idUsuario,
+                                p_Contrasena = encryptedPassword,
+                                p_ContrasennaAnterior = encryptedPasswordOld,
+                                p_ContrasennaConfirmar = encryptedPasswordConfirm,
                             },
                             transaction,
                             commandType: CommandType.StoredProcedure
@@ -227,9 +227,9 @@ namespace TCUApi.Controllers
                     }
                 }
             }
-            catch (SqlException sqlEx)
+            catch (MySqlException MySqlEx)
             {
-                return StatusCode(500, new { Indicador = false , Mensaje = sqlEx.Message });
+                return StatusCode(500, new { Indicador = false , Mensaje = MySqlEx.Message });
             }
             catch (Exception ex)
             {
@@ -246,16 +246,16 @@ namespace TCUApi.Controllers
             {
                 long idUsuario = _general.ObtenerUsuarioFromToken(User.Claims);
 
-                using (var context = new SqlConnection(_configuration.GetConnectionString("AbrazosDBConnection")))
+                using (var context = new MySqlConnection(_configuration.GetConnectionString("AbrazosDBConnection")))
                 {
                     var result = context.Execute("ActualizarUsuario", new
                     {
-                        Id_usuario = idUsuario,
-                        model.NombreUsuario,
-                        model.Apellidos,
-                        model.Correo,
-                        model.Username,
-                        model.Id_Rol,
+                        p_Id_Usuario = idUsuario,
+                        p_NombreUsuario = model.NombreUsuario,
+                        p_Apellidos = model.Apellidos,
+                        p_Correo = model.Correo,
+                        p_Username = model.Username,
+                        p_Id_Rol = model.Id_Rol,
                     });
 
                     return Ok(new RespuestaModel
@@ -265,9 +265,9 @@ namespace TCUApi.Controllers
                     });
                 }
             }
-            catch (SqlException sqlEx)
+            catch (MySqlException MySqlEx)
             {
-                return StatusCode(500, new { error = "Error en la base de datos", Mensaje = sqlEx.Message });
+                return StatusCode(500, new { error = "Error en la base de datos", Mensaje = MySqlEx.Message });
             }
             catch (Exception ex)
             {
@@ -284,15 +284,15 @@ namespace TCUApi.Controllers
                 
                 long idUsuario = _general.ObtenerUsuarioFromToken(User.Claims);
 
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("AbrazosDBConnection")))
+                using (var connection = new MySqlConnection(_configuration.GetConnectionString("AbrazosDBConnection")))
                 {
-                    var result = connection.Query<UsuarioModel>("ObtenerUsuarios", new { Id_usuario = idUsuario }, commandType: CommandType.StoredProcedure).ToList();
+                    var result = connection.Query<UsuarioModel>("ObtenerUsuarios", new { p_Id_Usuario = idUsuario }, commandType: CommandType.StoredProcedure).ToList();
                     return Ok(new RespuestaModel { Indicador = true, Datos = result });
                 }
             }
-            catch (SqlException sqlEx)
+            catch (MySqlException MySqlEx)
             {
-                return StatusCode(500, new { error = "Error en la base de datos", detalle = sqlEx.Message });
+                return StatusCode(500, new { error = "Error en la base de datos", detalle = MySqlEx.Message });
             }
             catch (Exception ex)
             {
@@ -312,7 +312,7 @@ namespace TCUApi.Controllers
             try
             {
                
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("AbrazosDBConnection")))
+                using (var connection = new MySqlConnection(_configuration.GetConnectionString("AbrazosDBConnection")))
                 {
                     var result = connection.Query<RolModel>("ObtenerRoles",  commandType: CommandType.StoredProcedure).ToList();
 
@@ -325,9 +325,9 @@ namespace TCUApi.Controllers
                     return Ok(new RespuestaModel { Indicador = true, Datos = result });
                 }
             }
-            catch (SqlException sqlEx)
+            catch (MySqlException MySqlEx)
             {
-                return StatusCode(500, new { error = "Error en la base de datos", detalle = sqlEx.Message });
+                return StatusCode(500, new { error = "Error en la base de datos", detalle = MySqlEx.Message });
             }
             catch (Exception ex)
             {

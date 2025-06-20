@@ -11,6 +11,7 @@ const usuario = ref({
   Apellidos: '',
   Cedula: '',
   Email: '',
+  Telefono: '',
 })
 
 const mensaje = ref('')
@@ -58,7 +59,8 @@ const registrar = async () => {
     !usuario.value.NombreUsuario ||
     !usuario.value.Apellidos ||
     !usuario.value.Cedula ||
-    !usuario.value.Correo
+    !usuario.value.Correo ||
+    !usuario.value.Telefono
   ) {
     errorMsg.value = 'Por favor complete todos los campos.'
     return
@@ -146,6 +148,16 @@ const registrar = async () => {
               v-model="usuario.Correo"
               type="email"
               placeholder="Ingrese su correo electrónico"
+              class="w-full px-4 py-3 rounded-lg bg-[#F3E9DC] text-gray-800 mt-1 border border-[#D6BFA4] focus:border-orange-500 focus:bg-white focus:outline-none"
+              required
+            />
+          </div>
+          <div>
+            <label class="block text-[#FBE4C8] text-sm font-medium">Numero Telefonico</label>
+            <input
+              v-model="usuario.Telefono"
+              type="number"
+              placeholder="Ingrese su numero telefonico"
               class="w-full px-4 py-3 rounded-lg bg-[#F3E9DC] text-gray-800 mt-1 border border-[#D6BFA4] focus:border-orange-500 focus:bg-white focus:outline-none"
               required
             />

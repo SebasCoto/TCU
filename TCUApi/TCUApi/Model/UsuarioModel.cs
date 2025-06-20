@@ -14,6 +14,7 @@
         public string? ConfirmPassword { get; set; }
         public string? Token { get; set; }
         public int Id_Rol { get; set; }
+        public int Telefono { get; set; }
         public string? NombreRol { get; set; }
         public long Id_EstadoRegistro { get; set; }
         public string?  NombreEstadoRegistro { get; set; }

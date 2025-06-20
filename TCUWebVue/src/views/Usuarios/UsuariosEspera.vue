@@ -57,9 +57,23 @@
           <p class="font-semibold text-xl text-indigo-700 mb-2">
             {{ usuario.nombre }} {{ usuario.apellido }}
           </p>
+
+          <!-- Datos personales -->
+          <ul class="text-gray-600 text-sm space-y-1">
+            <li><strong>Apellidos:</strong> {{ usuario.apellidos }}</li>
+          </ul>
+
+          <!-- Línea divisoria -->
+          <hr class="my-2 border-gray-300" />
+
+          <!-- Sección de contacto -->
+          <p class="font-semibold text-sm text-gray-700 mt-2 mb-1">Información de contacto:</p>
           <ul class="text-gray-600 text-sm space-y-1">
             <li><strong>Correo:</strong> {{ usuario.correo }}</li>
+            <li><strong>Teléfono:</strong> {{ formatearTelefono(usuario.telefono) }}</li>
           </ul>
+
+          <!-- Botón -->
           <div class="flex justify-end space-x-2 mt-4">
             <button
               @click="abrirModal(usuario.correo, usuario.id)"
@@ -77,8 +91,8 @@
                   stroke-linecap="round"
                   stroke-linejoin="round"
                   d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652
-                 L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1
-                 1.13-1.897l8.932-8.931Z"
+          L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1
+          1.13-1.897l8.932-8.931Z"
                 />
               </svg>
               Editar Acceso
@@ -146,11 +160,19 @@ const obtenerUsuariosEspera = async () => {
     apellidos: v.Apellidos,
     correo: v.Correo,
     Idrol: v.Id_Rol,
+    telefono: v.Telefono,
     nombreRol: v.NombreRol,
     nombreEstado: v.NombreEstadoRegistro,
   }))
 }
-
+const formatearTelefono = (telefono) => {
+  if (!telefono) return ''
+  const telStr = String(telefono)
+  if (/^\d{8}$/.test(telStr)) {
+    return telStr.replace(/(\d{4})(\d{4})/, '$1-$2')
+  }
+  return telStr
+}
 const abrirModal = (correo, id) => {
   idUsuario.value = Number(id)
   correoSeleccionado.value = correo

@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.SqlClient;
+using MySql.Data.MySqlClient;
 using System.Data;
 using TCUApi.Model;
 using TCUApi.Servicios;
@@ -50,15 +50,15 @@ namespace TCUApi.Controllers
                     return Unauthorized(new { mensaje = "No tiene permisos para realizar esta acción" });
                 }
 
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("AbrazosDBConnection")))
+                using (var connection = new MySqlConnection(_configuration.GetConnectionString("AbrazosDBConnection")))
                 {
-                    var result = connection.Execute("CalcularPresupuesto", new { MONTO_TOTAL = MontoTotal }, commandType: CommandType.StoredProcedure);
+                    var result = connection.Execute("CalcularPresupuesto", new { p_MONTO_TOTAL = MontoTotal }, commandType: CommandType.StoredProcedure);
                     return Ok(new RespuestaModel { Indicador = true, Mensaje = "Presupuesto registrado correctamente" });
                 }
             }
-            catch (SqlException sqlEx)
+            catch (MySqlException MySqlEx)
             {
-                return StatusCode(500, new { error = "Error en la base de datos", detalle = sqlEx.Message, codigo = sqlEx.Number });
+                return StatusCode(500, new { error = "Error en la base de datos", detalle = MySqlEx.Message, codigo = MySqlEx.Number });
             }
             catch (Exception ex)
             {
