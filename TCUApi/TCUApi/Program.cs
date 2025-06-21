@@ -13,7 +13,7 @@ builder.Services.AddCors(options =>
         policy =>
         {
             policy.WithOrigins(
-            "https://localhost:7216",
+            "http://localhost:7216",
             "https://spiffy-bienenstitch-2a115a.netlify.app"
         )
 

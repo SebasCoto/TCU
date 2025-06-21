@@ -2,7 +2,7 @@ import axios from 'axios'
 import router from '@/router' // Importa el enrutador de Vue
 
 const Api = axios.create({
-  baseURL: 'https://localhost:7216/api',
+  baseURL: 'https://spiffy-bienenstitch-2a115a.netlify.app/api',
   headers: {
     'Content-Type': 'application/json',
   },
