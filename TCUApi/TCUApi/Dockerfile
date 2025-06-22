@@ -1,21 +1,23 @@
-# Build stage
+# Etapa de build
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# Copiamos sólo el proyecto y restauramos dependencias (sin obj ni bin)
+# Copiar solo el csproj y restaurar para aprovechar cache
 COPY ["TCUApi.csproj", "./"]
 RUN dotnet restore "TCUApi.csproj"
 
-# Copiamos sólo el código fuente (excluyendo bin y obj por .dockerignore)
+# Copiar el resto del código
 COPY . .
 
-RUN dotnet publish "TCUApi.csproj" -c Release -o /app/publish /p:UseAppHost=false
+# Hacer build (esto genera obj y bin)
+RUN dotnet build "TCUApi.csproj" -c Release -o /app/build
 
-# Runtime stage
-FROM mcr.microsoft.com/dotnet/aspnet:8.0
+# Hacer publish (usar --no-build para no recompilar)
+RUN dotnet publish "TCUApi.csproj" -c Release -o /app/publish --no-build /p:UseAppHost=false
+
+# Etapa de runtime
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
 COPY --from=build /app/publish .
-
-EXPOSE 8080
 
 ENTRYPOINT ["dotnet", "TCUApi.dll"]
