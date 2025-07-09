@@ -149,6 +149,10 @@ export default {
       type: Boolean,
       required: true,
     },
+    fechaSeleccionada: {
+      type: String,
+      default: '',
+    },
   },
   setup(props, { emit }) {
     // Usa las funciones y variables del archivo JS

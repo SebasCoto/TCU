@@ -2,7 +2,7 @@ import axios from 'axios'
 import router from '@/router' // Importa el enrutador de Vue
 
 const Api = axios.create({
-  baseURL: 'https://localhost:7216/api',
+  baseURL: 'https://tcuapi-347753261863.us-central1.run.app/api',
   headers: {
     'Content-Type': 'application/json',
   },

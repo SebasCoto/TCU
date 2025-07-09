@@ -13,6 +13,7 @@ export default {
   },
   props: {
     modalVisible: Boolean,
+    fechaSeleccionada: String,
   },
   emits: ['cerrar'],
   setup(props, { emit }) {
@@ -21,11 +22,12 @@ export default {
     const loading = ref(false)
     const mensaje = ref('')
     const errorMsg = ref('')
+
     const evento = ref({
       titulo: '',
       descripcion: '',
-      fechaInicio: '',
-      fechaFinal: '', // Agregada aquí
+      fechaInicio: props.fechaSeleccionada || '',
+      fechaFinal: props.fechaSeleccionada || '',
       color: '#ffffff',
     })
 
@@ -60,14 +62,30 @@ export default {
       }
     }
 
+    // Watch para cuando cambie la fecha seleccionada
+    watch(
+      () => props.fechaSeleccionada,
+      (nuevaFecha) => {
+        if (nuevaFecha) {
+          evento.value.fechaInicio = nuevaFecha
+          evento.value.fechaFinal = nuevaFecha
+        }
+      },
+      { immediate: true },
+    )
+
     watch(
       () => props.modalVisible,
       (nuevoValor) => {
         if (nuevoValor) {
-          console.log('Modal abierto, cargando correos...')
+          // Usar la fecha seleccionada o la fecha actual como fallback
+          const fecha = props.fechaSeleccionada
+          if (fecha) {
+            evento.value.fechaInicio = fecha
+            evento.value.fechaFinal = fecha
+          }
           cargarCorreos() // Solo cargar correos cuando el modal esté abierto
         } else {
-          console.log('Modal cerrado, limpiando datos...')
           correos.value = [] // Limpia los datos si es necesario
           selectedCorreos.value = []
           errorMsg.value = ''
@@ -77,8 +95,6 @@ export default {
     )
 
     const guardarEvento = async () => {
-      console.log('Intentando guardar el evento...')
-
       const eventoData = {
         Nombre_Evento: evento.value.titulo,
         Descripcion: evento.value.descripcion,
@@ -87,8 +103,6 @@ export default {
         Color: evento.value.color,
         Invitados: selectedCorreos.value.map((correo) => correo.id).join(','), // Convertir a cadena separada por comas
       }
-
-      console.log('Datos del evento a enviar:', eventoData)
 
       errorMsg.value = ''
       mensaje.value = ''
@@ -109,7 +123,6 @@ export default {
           icon: 'success',
           title: 'Evento agregado correctamente',
         })
-        console.log('Evento actualizado emitido desde CrearEventoModal')
         emit('evento-actualizado')
         cerrarModal()
       } catch (error) {

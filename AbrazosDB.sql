@@ -2,9 +2,9 @@ CREATE DATABASE  IF NOT EXISTS `abrazosdb` /*!40100 DEFAULT CHARACTER SET utf8mb
 USE `abrazosdb`;
 -- MySQL dump 10.13  Distrib 8.0.40, for Win64 (x86_64)
 --
--- Host: localhost    Database: abrazosdb
+-- Host: 35.225.129.187    Database: abrazosdb
 -- ------------------------------------------------------
--- Server version	9.1.0
+-- Server version	8.0.41-google
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -16,6 +16,14 @@ USE `abrazosdb`;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+SET @MYSQLDUMP_TEMP_LOG_BIN = @@SESSION.SQL_LOG_BIN;
+SET @@SESSION.SQL_LOG_BIN= 0;
+
+--
+-- GTID state at the beginning of the backup 
+--
+
+SET @@GLOBAL.GTID_PURGED=/*!80000 '+'*/ '26783f34-56c8-11f0-949e-42010a400002:1-241';
 
 --
 -- Table structure for table `archivosuser`
@@ -256,7 +264,7 @@ CREATE TABLE `usuarios` (
   `Id_EstadoRegistro` bigint DEFAULT NULL,
   `telefono` int NOT NULL,
   PRIMARY KEY (`id_usuario`)
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -265,7 +273,7 @@ CREATE TABLE `usuarios` (
 
 LOCK TABLES `usuarios` WRITE;
 /*!40000 ALTER TABLE `usuarios` DISABLE KEYS */;
-INSERT INTO `usuarios` VALUES (4,'305590015','SEBASTIAN','COTO GONZALEZ	','secogonzalez2005@gmail.com','scoto','Y4dZkkZdfWjaSVA6O/HUOg==',1,'2025-04-25',0,'2025-06-20 13:07:23',NULL,1,0);
+INSERT INTO `usuarios` VALUES (4,'305590015','SEBASTIAN','COTO GONZALEZ	','secogonzalez2005@gmail.com','scoto','pmWkWSBCL51Bfkhn79xPuKBKHz//H6B+mY6G9/eieuM=',1,'2025-04-25',0,'2025-07-03 21:17:06',NULL,1,0),(16,'303690936','LAURA MARIELA','GONZALEZ CHACON','scoto90015@ufide.ac.cr','lgonzalez','qet+JK/dMTOdGPeHwix25/0JrIWWAZ09ivR9oYoRP9o=',2,'2025-07-04',0,NULL,NULL,3,12345678);
 /*!40000 ALTER TABLE `usuarios` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -310,17 +318,17 @@ UNLOCK TABLES;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`adminAbrazos`@`%` PROCEDURE `AccesoUsuarios`(
+CREATE DEFINER=`root`@`%` PROCEDURE `AccesoUsuarios`(
     IN p_Id_Usuario BIGINT,
     IN p_Id_EstadoRegistro BIGINT
 )
 BEGIN
-    -- Actualizar el estado del usuario
+    
     UPDATE usuarios 
     SET Id_EstadoRegistro = p_Id_EstadoRegistro
     WHERE id_usuario = p_Id_Usuario;
 
-    -- Si el nuevo estado es 2, eliminar el usuario
+    
     IF p_Id_EstadoRegistro = 2 THEN
         DELETE FROM usuarios 
         WHERE id_usuario = p_Id_Usuario
@@ -348,7 +356,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`adminAbrazos`@`%` PROCEDURE `ActualizarContrasenna`(
+CREATE DEFINER=`root`@`%` PROCEDURE `ActualizarContrasenna`(
     IN p_Id_usuario BIGINT,
     IN p_Contrasena VARCHAR(50),
     IN p_ContrasennaAnterior VARCHAR(100),
@@ -386,7 +394,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`adminAbrazos`@`%` PROCEDURE `ActualizarEvento`(
+CREATE DEFINER=`root`@`%` PROCEDURE `ActualizarEvento`(
     IN p_Id_Evento BIGINT,
     IN p_Nombre_Evento VARCHAR(50),
     IN p_Descripcion TEXT,
@@ -416,7 +424,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`adminAbrazos`@`%` PROCEDURE `ActualizarFamilia`(
+CREATE DEFINER=`root`@`%` PROCEDURE `ActualizarFamilia`(
     IN p_Id_Familia BIGINT,
     IN p_Nombre_Representante VARCHAR(100),
     IN p_Cedula_Representante VARCHAR(100),
@@ -465,7 +473,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`adminAbrazos`@`%` PROCEDURE `ActualizarProducto`(
+CREATE DEFINER=`root`@`%` PROCEDURE `ActualizarProducto`(
     IN p_Id_Inventario INT,
     IN p_NombreProducto VARCHAR(100),
     IN p_Id_Categoria INT,
@@ -500,7 +508,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`adminAbrazos`@`%` PROCEDURE `ActualizarUsuario`(
+CREATE DEFINER=`root`@`%` PROCEDURE `ActualizarUsuario`(
     IN p_Id_Usuario BIGINT,
     IN p_NombreUsuario VARCHAR(100),
     IN p_Apellidos VARCHAR(100),
@@ -553,7 +561,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`adminAbrazos`@`%` PROCEDURE `CalcularPresupuesto`(
+CREATE DEFINER=`root`@`%` PROCEDURE `CalcularPresupuesto`(
     IN p_MONTO_TOTAL DECIMAL(10,2)
 )
 BEGIN
@@ -607,7 +615,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`adminAbrazos`@`%` PROCEDURE `EliminarEvento`(
+CREATE DEFINER=`root`@`%` PROCEDURE `EliminarEvento`(
     IN p_Id_Evento BIGINT
 )
 BEGIN
@@ -629,7 +637,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`adminAbrazos`@`%` PROCEDURE `EliminarFamilia`(
+CREATE DEFINER=`root`@`%` PROCEDURE `EliminarFamilia`(
     IN p_Id_Familia BIGINT
 )
 BEGIN
@@ -651,7 +659,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`adminAbrazos`@`%` PROCEDURE `EliminarProducto`(
+CREATE DEFINER=`root`@`%` PROCEDURE `EliminarProducto`(
     IN p_Id_Inventario INT
 )
 BEGIN
@@ -673,7 +681,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`adminAbrazos`@`%` PROCEDURE `EliminarUsuario`(
+CREATE DEFINER=`root`@`%` PROCEDURE `EliminarUsuario`(
     IN p_Id_Usuario BIGINT
 )
 BEGIN
@@ -695,7 +703,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`adminAbrazos`@`%` PROCEDURE `IniciarSesion`(
+CREATE DEFINER=`root`@`%` PROCEDURE `IniciarSesion`(
     IN Username VARCHAR(100),
     IN p_password VARCHAR(100)
 )
@@ -729,7 +737,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`adminAbrazos`@`%` PROCEDURE `MostrarEventos`(
+CREATE DEFINER=`root`@`%` PROCEDURE `MostrarEventos`(
     IN p_Id_Evento BIGINT
 )
 BEGIN
@@ -756,7 +764,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`adminAbrazos`@`%` PROCEDURE `ObtenerCategorias`()
+CREATE DEFINER=`root`@`%` PROCEDURE `ObtenerCategorias`()
 BEGIN
     SELECT id_categoria, nombre
     FROM categoria;
@@ -776,7 +784,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`adminAbrazos`@`%` PROCEDURE `ObtenerCorreoById`(
+CREATE DEFINER=`root`@`%` PROCEDURE `ObtenerCorreoById`(
     IN p_Id_usuario BIGINT
 )
 BEGIN
@@ -799,7 +807,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`adminAbrazos`@`%` PROCEDURE `ObtenerCorreosSeleccionados`(
+CREATE DEFINER=`root`@`%` PROCEDURE `ObtenerCorreosSeleccionados`(
     IN p_CorreoLogueado VARCHAR(100),
     IN p_Filtro VARCHAR(100)
 )
@@ -824,7 +832,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`adminAbrazos`@`%` PROCEDURE `ObtenerEstados`()
+CREATE DEFINER=`root`@`%` PROCEDURE `ObtenerEstados`()
 BEGIN
     SELECT Id_EstadoRegistro, Nombre FROM EstadoRegistro;
 END ;;
@@ -843,7 +851,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`adminAbrazos`@`%` PROCEDURE `ObtenerExpedientes`(
+CREATE DEFINER=`root`@`%` PROCEDURE `ObtenerExpedientes`(
     IN p_Id_Expediente BIGINT
 )
 BEGIN
@@ -884,7 +892,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`adminAbrazos`@`%` PROCEDURE `ObtenerFamilias`(
+CREATE DEFINER=`root`@`%` PROCEDURE `ObtenerFamilias`(
     IN p_Id_Familia BIGINT
 )
 BEGIN
@@ -923,7 +931,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`adminAbrazos`@`%` PROCEDURE `ObtenerProductos`(
+CREATE DEFINER=`root`@`%` PROCEDURE `ObtenerProductos`(
     IN p_Id_Inventario BIGINT
 )
 BEGIN
@@ -957,7 +965,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`adminAbrazos`@`%` PROCEDURE `ObtenerRoles`()
+CREATE DEFINER=`root`@`%` PROCEDURE `ObtenerRoles`()
 BEGIN
     SELECT * FROM rol;
 END ;;
@@ -976,7 +984,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`adminAbrazos`@`%` PROCEDURE `ObtenerUsuarios`(IN p_Id_usuario BIGINT)
+CREATE DEFINER=`root`@`%` PROCEDURE `ObtenerUsuarios`(IN p_Id_usuario BIGINT)
 BEGIN
     IF p_Id_usuario = 0 THEN
         SET p_Id_usuario = NULL;
@@ -1012,7 +1020,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`adminAbrazos`@`%` PROCEDURE `ObtenerUsuariosEspera`(IN p_Id_usuario BIGINT)
+CREATE DEFINER=`root`@`%` PROCEDURE `ObtenerUsuariosEspera`(IN p_Id_usuario BIGINT)
 BEGIN
     IF p_Id_usuario = 0 THEN
         SET p_Id_usuario = NULL;
@@ -1050,7 +1058,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`adminAbrazos`@`%` PROCEDURE `ObtenerVoluntarios`(IN p_Id_usuario BIGINT)
+CREATE DEFINER=`root`@`%` PROCEDURE `ObtenerVoluntarios`(IN p_Id_usuario BIGINT)
 BEGIN
     IF p_Id_usuario = 0 THEN
         SET p_Id_usuario = NULL;
@@ -1087,7 +1095,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`adminAbrazos`@`%` PROCEDURE `ObtenerVulnerabilidad`()
+CREATE DEFINER=`root`@`%` PROCEDURE `ObtenerVulnerabilidad`()
 BEGIN
     SELECT id_vulnerabilidad, nombre FROM vulnerabilidad;
 END ;;
@@ -1106,7 +1114,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`adminAbrazos`@`%` PROCEDURE `RecuperarContrasenna`(
+CREATE DEFINER=`root`@`%` PROCEDURE `RecuperarContrasenna`(
     IN p_Id_usuario BIGINT,
     IN p_Contrasenna VARCHAR(50),
     IN p_ContrasennaAnterior VARCHAR(50),
@@ -1134,7 +1142,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`adminAbrazos`@`%` PROCEDURE `RegistrarArchivo`(
+CREATE DEFINER=`root`@`%` PROCEDURE `RegistrarArchivo`(
     IN p_Nombre VARCHAR(255),
     IN p_Tipo VARCHAR(100),
     IN p_Ruta VARCHAR(500),
@@ -1163,7 +1171,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`adminAbrazos`@`%` PROCEDURE `RegistrarEvento`(
+CREATE DEFINER=`root`@`%` PROCEDURE `RegistrarEvento`(
     IN p_Nombre_Evento VARCHAR(50),
     IN p_Descripcion TEXT,
     IN p_Fecha_Inicio DATETIME,
@@ -1190,7 +1198,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`adminAbrazos`@`%` PROCEDURE `RegistrarFamilia`(
+CREATE DEFINER=`root`@`%` PROCEDURE `RegistrarFamilia`(
     IN p_Nombre_Representante VARCHAR(100),
     IN p_Cedula_Representante VARCHAR(100),
     IN p_Direccion VARCHAR(255),
@@ -1231,7 +1239,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`adminAbrazos`@`%` PROCEDURE `RegistrarProducto`(
+CREATE DEFINER=`root`@`%` PROCEDURE `RegistrarProducto`(
     IN p_NombreProducto VARCHAR(100),
     IN p_Id_Categoria INT,
     IN p_stock INT
@@ -1259,7 +1267,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`adminAbrazos`@`%` PROCEDURE `RegistrarUsuario`(
+CREATE DEFINER=`root`@`%` PROCEDURE `RegistrarUsuario`(
     IN p_NombreUsuario VARCHAR(100),
     IN p_Cedula VARCHAR(50),
     IN p_Apellidos VARCHAR(100),
@@ -1301,7 +1309,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`adminAbrazos`@`%` PROCEDURE `VerificarCorreo`(
+CREATE DEFINER=`root`@`%` PROCEDURE `VerificarCorreo`(
     IN p_Correo VARCHAR(100)
 )
 BEGIN
@@ -1313,7 +1321,7 @@ BEGIN
             U.Cedula,
             U.username,
             E.Nombre AS NombreEstadoRegistro
-    FROM EstadoRegistro E
+    FROM estadoregistro E
     JOIN usuarios U ON E.Id_EstadoRegistro = U.Id_EstadoRegistro
     JOIN rol r ON U.id_rol = r.id_rol
     WHERE U.Correo = p_Correo;
@@ -1333,7 +1341,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`adminAbrazos`@`%` PROCEDURE `VerificarIsVoluntario`(
+CREATE DEFINER=`root`@`%` PROCEDURE `VerificarIsVoluntario`(
     IN p_Cedula VARCHAR(100)
 )
 BEGIN
@@ -1355,6 +1363,7 @@ DELIMITER ;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;
 /*!50003 SET character_set_results = @saved_cs_results */ ;
 /*!50003 SET collation_connection  = @saved_col_connection */ ;
+SET @@SESSION.SQL_LOG_BIN = @MYSQLDUMP_TEMP_LOG_BIN;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -1365,4 +1374,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-06-20 14:00:33
+-- Dump completed on 2025-07-07 15:03:01

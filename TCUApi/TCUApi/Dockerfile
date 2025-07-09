@@ -1,4 +1,4 @@
-# Etapa de build
+﻿# Etapa de build
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
@@ -15,6 +15,12 @@ RUN dotnet publish "TCUApi.csproj" -c Release -o /app/publish /p:UseAppHost=fals
 # Etapa de runtime
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
-COPY --from=build /app/publish .
+
+# ⬅️ Añadir esta línea para permitir conexión por socket Unix
+RUN apt-get update && apt-get install -y libnss3 libgssapi-krb5-2
+
+COPY --from=build /app/publish/ .  
+
+
 
 ENTRYPOINT ["dotnet", "TCUApi.dll"]

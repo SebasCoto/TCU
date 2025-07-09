@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using MySql.Data.MySqlClient;
+using MySqlConnector;
 using System.Data;
 using System.Security.Cryptography;
 using System.Text;
@@ -27,95 +27,111 @@ namespace TCUApi.Controllers
         }
         [HttpPut]
         [Route("AccesoUsuarios")]
-        public IActionResult AccesoUsuarios([FromBody] UsuarioModel model)  
+        public IActionResult AccesoUsuarios([FromBody] UsuarioModel model)
         {
-            string mensaje = model.mensaje!;  
-
-            if (!_general.EsAdministrador(User.Claims))
+            try
             {
-                return Unauthorized(new { mensaje = "No tiene permisos para realizar esta acción" });
-            }
+                string mensaje = model.mensaje!;
 
-            using (var context = new MySqlConnection(_configuration.GetSection("ConnectionStrings:AbrazosDBConnection").Value))
-            {
-                
-
-                var respuesta = new RespuestaModel();
-                string rutaPlantilla = "";
-                string contenidoHtml = "";
-
-                var result = context.QueryFirstOrDefault<UsuarioModel>("VerificarCorreo",
-                    new { p_Correo = model.Correo });
-
-                var nombreEstado = context.ExecuteScalar<string>("AccesoUsuarios",
-                    new { p_Id_EstadoRegistro = model.Id_EstadoRegistro, p_Id_Usuario = model.Id_usuario }, commandType: CommandType.StoredProcedure);
-
-                if (result != null)
+                if (!_general.EsAdministrador(User.Claims))
                 {
-                    if (nombreEstado == "ELIMINADO")
-                    {
-                        respuesta.Indicador = true;
-                        respuesta.Mensaje = "El usuario fue eliminado correctamente.";
-                        rutaPlantilla = Path.Combine(Directory.GetCurrentDirectory(), "Templates", "TemplateUsuarioDenegado.html");
-                    }
-                    else if (!string.IsNullOrEmpty(nombreEstado))
-                    {
-                        respuesta.Indicador = true;
-                        respuesta.Mensaje = "El estado del registro del usuario ha sido actualizado a " + nombreEstado;
-                        rutaPlantilla = Path.Combine(Directory.GetCurrentDirectory(), "Templates", "TemplateEstadoAceptado.html");
+                    return Unauthorized(new { mensaje = "No tiene permisos para realizar esta acción" });
+                }
 
-                        if (nombreEstado == "Aceptado")
+                using (var context = new MySqlConnection(_configuration.GetSection("ConnectionStrings:AbrazosDBConnection").Value))
+                {
+                    var respuesta = new RespuestaModel();
+                    string rutaPlantilla = "";
+                    string contenidoHtml = "";
+
+                    var result = context.QueryFirstOrDefault<UsuarioModel>("VerificarCorreo",
+                        new { p_Correo = model.Correo });
+
+                    var nombreEstado = context.ExecuteScalar<string>("AccesoUsuarios",
+                        new { p_Id_EstadoRegistro = model.Id_EstadoRegistro, p_Id_Usuario = model.Id_usuario }, commandType: CommandType.StoredProcedure);
+
+                    if (result != null)
+                    {
+                        if (nombreEstado == "ELIMINADO")
                         {
-                            string codigo = CreatePassword();
-                            string contrasennaEncriptada = Encrypt(codigo);
-                            string contrasennaAnterior = string.Empty;
-
-                            var fechaVencimiento = model.password_temp_expiration = DateTime.Now.AddMinutes(
-                                double.Parse(_configuration.GetSection("Variables:MinutosVigenciaTemporal").Value!));
-
-                            context.Execute("RecuperarContrasenna",
-                                new { p_Id_usuario = result!.Id_usuario, p_Contrasenna = contrasennaEncriptada, p_ContrasennaAnterior = contrasennaAnterior, p_VencimientoContraTemp = fechaVencimiento });
-
-                            contenidoHtml = System.IO.File.ReadAllText(rutaPlantilla);
-                            contenidoHtml = contenidoHtml.Replace("@@Codigo", codigo);
+                            respuesta.Indicador = true;
+                            respuesta.Mensaje = "El usuario fue eliminado correctamente.";
+                            rutaPlantilla = Path.Combine(Directory.GetCurrentDirectory(), "Templates", "TemplateUsuarioDenegado.html");
                         }
+                        else if (!string.IsNullOrEmpty(nombreEstado))
+                        {
+                            respuesta.Indicador = true;
+                            respuesta.Mensaje = "El estado del registro del usuario ha sido actualizado a " + nombreEstado;
+                            rutaPlantilla = Path.Combine(Directory.GetCurrentDirectory(), "Templates", "TemplateEstadoAceptado.html");
+
+                            if (nombreEstado == "Aceptado")
+                            {
+                                string codigo = CreatePassword();
+                                string contrasennaEncriptada = _general.HashSHA256(codigo);
+                                string contrasennaAnterior = string.Empty;
+
+                                var fechaVencimiento = model.password_temp_expiration = DateTime.Now.AddMinutes(
+                                    double.Parse(_configuration.GetSection("Variables:MinutosVigenciaTemporal").Value!));
+
+                                context.Execute("RecuperarContrasenna",
+                                    new
+                                    {
+                                        p_Id_usuario = result!.Id_usuario,
+                                        p_Contrasenna = contrasennaEncriptada,
+                                        p_ContrasennaAnterior = contrasennaAnterior,
+                                        p_VencimientoContraTemp = fechaVencimiento
+                                    });
+
+                                contenidoHtml = System.IO.File.ReadAllText(rutaPlantilla);
+                                contenidoHtml = contenidoHtml.Replace("@@Codigo", codigo);
+                            }
+                        }
+                        else
+                        {
+                            respuesta.Indicador = false;
+                            respuesta.Mensaje = "No se ha podido actualizar el estado del usuario.";
+                        }
+
+                        if (System.IO.File.Exists(rutaPlantilla))
+                        {
+                            if (string.IsNullOrEmpty(contenidoHtml))
+                            {
+                                contenidoHtml = System.IO.File.ReadAllText(rutaPlantilla);
+                            }
+
+                            contenidoHtml = contenidoHtml
+                                .Replace("@@NOMBRE_USUARIO", result!.NombreUsuario)
+                                .Replace("@@FECHA_GENERACION", DateTime.Now.ToString("dd/MM/yyyy HH:mm"))
+                                .Replace("@@NOMBRE_INGRESO", result!.Username)
+                                .Replace("@@ESTADO_NUEVO", nombreEstado);
+
+                            string mensajeExtra = string.IsNullOrEmpty(mensaje) ? "" : mensaje;
+                            contenidoHtml = contenidoHtml.Replace("@@MENSAJE_EXTRA", mensajeExtra);
+
+                            _general.EnviarCorreo(model.Correo!, "Actualización de Acceso", contenidoHtml);
+                        }
+
                     }
                     else
                     {
                         respuesta.Indicador = false;
-                        respuesta.Mensaje = "No se ha podido actualizar el estado del usuario.";
+                        respuesta.Mensaje = "No se ha encontrado el correo en la base de datos.";
                     }
 
-                    if (System.IO.File.Exists(rutaPlantilla))
-                    {
-                        if (string.IsNullOrEmpty(contenidoHtml))
-                        {
-                            contenidoHtml = System.IO.File.ReadAllText(rutaPlantilla);
-                        }
-
-                        contenidoHtml = contenidoHtml
-                            .Replace("@@NOMBRE_USUARIO", result!.NombreUsuario)
-                            .Replace("@@FECHA_GENERACION", DateTime.Now.ToString("dd/MM/yyyy HH:mm"))
-                            .Replace("@@NOMBRE_INGRESO", result!.Username)
-                            .Replace("@@ESTADO_NUEVO", nombreEstado);
-
-                        string mensajeExtra = string.IsNullOrEmpty(mensaje) ? "" : mensaje;
-                        contenidoHtml = contenidoHtml.Replace("@@MENSAJE_EXTRA", mensajeExtra);
-
-                        _general.EnviarCorreo(model.Correo!, "Actualización de Acceso", contenidoHtml);
-                    }
-
+                    return Ok(respuesta);
                 }
-                else
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
                 {
-                    respuesta.Indicador = false;
-                    respuesta.Mensaje = "No se ha encontrado el correo en la base de datos.";
-                }
-
-
-                return Ok(respuesta);
+                    mensaje = "Error interno en el servidor.",
+                    detalle = ex.Message,
+                    stackTrace = ex.StackTrace
+                });
             }
         }
+
 
 
 
@@ -196,33 +212,6 @@ namespace TCUApi.Controllers
             return res.ToString();
 
         }
-        private string Encrypt(string texto)
-        {
-            byte[] iv = new byte[16];
-            byte[] array;
-
-            using (Aes aes = Aes.Create())
-            {
-                aes.Key = Encoding.UTF8.GetBytes(_configuration.GetSection("Variables:llaveCifrado").Value!);
-                aes.IV = iv;
-
-                ICryptoTransform encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
-
-                using (MemoryStream memoryStream = new MemoryStream())
-                {
-                    using (CryptoStream cryptoStream = new CryptoStream(memoryStream, encryptor, CryptoStreamMode.Write))
-                    {
-                        using (StreamWriter streamWriter = new StreamWriter(cryptoStream))
-                        {
-                            streamWriter.Write(texto);
-                        }
-
-                        array = memoryStream.ToArray();
-                    }
-                }
-            }
-
-            return Convert.ToBase64String(array);
-        }
+       
     }
 }

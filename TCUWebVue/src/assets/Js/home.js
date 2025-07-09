@@ -7,6 +7,7 @@ import { obtenerEventos, obtenerEventosPorId } from '@/services/Calendario/Calen
 const modalCrearVisible = ref(false)
 const modalEditarVisible = ref(false)
 const modalDetalleVisible = ref(false)
+const fechaSeleccionada = ref('')
 
 const eventoSeleccionado = ref({ title: '', description: '', start: '', end: '', color: '' })
 function formatearFecha(fecha) {
@@ -31,8 +32,6 @@ const calendarOptions = ref({
   selectable: false,
   editable: false,
   dateClick: function (info) {
-    console.log('Fecha seleccionada:', info.dateStr) // Verificar la fecha seleccionada
-
     const loginStore = useLoginStore()
     if (loginStore.NombreRol === 'Voluntario') {
       Swal.fire({
@@ -57,15 +56,11 @@ const calendarOptions = ref({
       return
     }
 
-    console.log('Fecha futura seleccionada:', info.dateStr) // Verificar si la fecha futura está siendo seleccionada
-
+    fechaSeleccionada.value = info.dateStr // Guardar la fecha seleccionada
     modalCrearVisible.value = true // Abrir el modal de detalles
-
-    console.log('Modal abierto:', modalCrearVisible.value) // Verificar si el modal se abre
   },
   events: [],
   eventClick: function (info) {
-    console.log('Evento seleccionado:', info.event) // Verificar el evento seleccionado
     eventoSeleccionado.value = {
       title: info.event.title || '',
       description: info.event.extendedProps?.description || '',
@@ -75,7 +70,6 @@ const calendarOptions = ref({
     }
 
     obtenerEventoById(info.event.id).then((evento) => {
-      console.log('Evento obtenido por ID:', evento) // Verificar el evento obtenido por ID
       eventoSeleccionado.value = {
         id: evento.Id_Evento,
         title: evento.Nombre_Evento,
@@ -116,13 +110,11 @@ const mostrarEventos = async () => {
 }
 
 const refrescarEventos = async () => {
-  console.log('Refrescando eventos...')
   const eventos = await mostrarEventos()
   calendarOptions.value = {
     ...calendarOptions.value,
     events: [...eventos], // Crear una nueva referencia al array de eventos
   }
-  console.log('Eventos actualizados:', eventos)
 }
 
 const obtenerEventoById = async (id) => {
@@ -147,6 +139,7 @@ export {
   modalEditarVisible,
   modalDetalleVisible,
   eventoSeleccionado,
+  fechaSeleccionada,
   calendarOptions,
   refrescarEventos,
 }

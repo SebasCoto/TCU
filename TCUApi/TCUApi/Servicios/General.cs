@@ -31,36 +31,17 @@ namespace TCUApi.Servicios
             return ObtenerRolFromToken(claims) == "Administrador"; 
         }
 
-        public string Encrypt(string texto)
+        
+
+        public string HashSHA256(string texto)
         {
-            byte[] iv = new byte[16];
-            byte[] array;
-
-            using (Aes aes = Aes.Create())
+            using (var sha = SHA256.Create())
             {
-                aes.Key = Encoding.UTF8.GetBytes(_configuration.GetSection("Variables:llaveCifrado").Value!);
-                aes.IV = iv;
-
-                ICryptoTransform encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
-
-                using (MemoryStream memoryStream = new MemoryStream())
-                {
-                    using (CryptoStream cryptoStream = new CryptoStream(memoryStream, encryptor, CryptoStreamMode.Write))
-                    {
-                        using (StreamWriter streamWriter = new StreamWriter(cryptoStream))
-                        {
-                            streamWriter.Write(texto);
-                        }
-
-                        array = memoryStream.ToArray();
-                    }
-                }
+                var bytes = Encoding.UTF8.GetBytes(texto);
+                var hash = sha.ComputeHash(bytes);
+                return Convert.ToBase64String(hash);
             }
-
-            return Convert.ToBase64String(array);
         }
-
-
         public void EnviarCorreo(string destino, string asunto, string contenido)
         {
             string cuenta = _configuration["Variables:Correo"]!;

@@ -13,7 +13,7 @@ using System.Security.Cryptography;
 using System.Text;
 using TCUApi.Model;
 using TCUApi.Servicios;
-using MySql.Data.MySqlClient;
+using MySqlConnector;
 
 
 
@@ -27,11 +27,13 @@ namespace TCUApi.Controllers
         private readonly IConfiguration _configuration;
         private readonly IGeneral _general;
         private readonly IHttpClientFactory _httpClientFactory;
-        public LoginController(IConfiguration configuration, IGeneral general, IHttpClientFactory httpClientFactory)
+        private readonly ILogger<LoginController> _logger;
+        public LoginController(IConfiguration configuration, IGeneral general, IHttpClientFactory httpClientFactory, ILogger<LoginController> logger)
         {
             _configuration = configuration;
             _general = general;
             _httpClientFactory = httpClientFactory;
+            _logger = logger;
         }
 
         #region iniciarSesion
@@ -39,46 +41,61 @@ namespace TCUApi.Controllers
         [Route("login")]
         public IActionResult IniciarSesion(UsuarioModel model)
         {
-            using (var context = new MySqlConnection(_configuration.GetSection("ConnectionStrings:AbrazosDBConnection").Value))
+            var respuesta = new RespuestaModel();
+
+            try
             {
-                context.Open();
-                var contraEncriptada = Encrypt(model.Password!);
-                var result = context.QueryFirstOrDefault<UsuarioModel>("IniciarSesion",
-                    new {   model.Username, p_password = contraEncriptada }, commandType: CommandType.StoredProcedure);
-
-                var respuesta = new RespuestaModel();
-
-                if (result == null)
+                using (var context = new MySqlConnection(_configuration.GetSection("ConnectionStrings:AbrazosDBConnection").Value))
                 {
-                    respuesta.Indicador = false;
-                    respuesta.Mensaje = "Usuario o contraseña incorrectos";
+                    context.Open();
+
+                    var contraEncriptada = HashSHA256(model.Password!);
+                    var result = context.QueryFirstOrDefault<UsuarioModel>("IniciarSesion",
+                        new { model.Username, p_password = contraEncriptada }, commandType: CommandType.StoredProcedure);
+
+                    _logger.LogInformation("Intento de inicio de sesión para el usuario: {Username}", model.Username);
+                    _logger.LogInformation(contraEncriptada);  
+
+
+                    if (result == null)
+                    {
+                        respuesta.Indicador = false;
+                        respuesta.Mensaje = "Usuario o contraseña incorrectos";
+                        return Ok(respuesta);
+                    }
+
+                    if (result.Id_EstadoRegistro == 3)
+                    {
+                        respuesta.Indicador = false;
+                        respuesta.Mensaje = "Usted está en lista de espera, no puede acceder al sistema";
+                        return Ok(respuesta);
+                    }
+
+                    if (result.password_temp_expiration > DateTime.Now)
+                    {
+                        respuesta.Indicador = false;
+                        respuesta.Mensaje = "El tiempo de la contraseña temporal expiro";
+                        return Ok(respuesta);
+                    }
+
+                    if (!string.IsNullOrEmpty(result.NombreRol))
+                        result.Token = GenerarToken(result.Id_usuario, result.NombreRol);
+
+                    respuesta.Indicador = true;
+                    respuesta.Datos = result;
+                    respuesta.Mensaje = "Se ha iniciado sesión con éxito";
+
                     return Ok(respuesta);
                 }
-
-                if (result.Id_EstadoRegistro == 3)
-                {
-                    respuesta.Indicador = false;
-                    respuesta.Mensaje = "Usted está en lista de espera, no puede acceder al sistema";
-                    return Ok(respuesta);
-                }
-
-                if(result.password_temp_expiration > DateTime.Now)
-                {
-                    respuesta.Indicador = false;
-                    respuesta.Mensaje = "El tiempo de la contraseña temporal expiro";
-                    return Ok(respuesta);
-                }
-
-                if (!string.IsNullOrEmpty(result.NombreRol))
-                    result.Token = GenerarToken(result.Id_usuario, result.NombreRol);
-
-                respuesta.Indicador = true;
-                respuesta.Datos = result;
-                respuesta.Mensaje = "Se ha iniciado sesión con éxito";
-
-                return Ok(respuesta);
+            }
+            catch (Exception ex)
+            {
+                respuesta.Indicador = false;
+                respuesta.Mensaje = "Error del servidor: " + ex.Message;
+                return StatusCode(500, respuesta);
             }
         }
+
 
         #endregion
 
@@ -97,7 +114,7 @@ namespace TCUApi.Controllers
 
 
                 model.Password = CreatePassword();
-                var passwordEncrypted = Encrypt(model.Password);
+                var passwordEncrypted = HashSHA256(model.Password);
                 var username = CreateUsername(model.NombreUsuario!, model.Apellidos!);
 
                 
@@ -125,7 +142,8 @@ namespace TCUApi.Controllers
                             new { p_Correo = model.Correo });
 
 
-                        string ruta = Path.Combine(Directory.GetCurrentDirectory(), "Templates", "CorreoCodigoAcceso.html");
+                        string ruta = Path.Combine(AppContext.BaseDirectory, "Templates", "CorreoCodigoAcceso.html");
+
                         string contenidoHtml = System.IO.File.ReadAllText(ruta);
 
                         contenidoHtml = contenidoHtml
@@ -204,7 +222,7 @@ namespace TCUApi.Controllers
                     }
 
                     string codigo = CreatePassword();
-                    string contrasennaEncriptada = Encrypt(codigo);
+                    string contrasennaEncriptada = HashSHA256(codigo);
                     string contrasennaAnterior = string.Empty;
 
 
@@ -217,6 +235,7 @@ namespace TCUApi.Controllers
 
 
                     string ruta = Path.Combine(Directory.GetCurrentDirectory(), "Templates", "TemplateCorreoRecuperarContrasena.html");
+
                     string contenidoHtml = System.IO.File.ReadAllText(ruta);
 
                     contenidoHtml = contenidoHtml
@@ -329,34 +348,16 @@ namespace TCUApi.Controllers
             }
         }
 
-        private string Encrypt(string texto)
+        private string HashSHA256(string texto)
         {
-            byte[] iv = new byte[16];
-            byte[] array;
-
-            using (Aes aes = Aes.Create())
+            using (var sha = SHA256.Create())
             {
-                aes.Key = Encoding.UTF8.GetBytes(_configuration.GetSection("Variables:llaveCifrado").Value!);
-                aes.IV = iv;
-
-                ICryptoTransform encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
-
-                using (MemoryStream memoryStream = new MemoryStream())
-                {
-                    using (CryptoStream cryptoStream = new CryptoStream(memoryStream, encryptor, CryptoStreamMode.Write))
-                    {
-                        using (StreamWriter streamWriter = new StreamWriter(cryptoStream))
-                        {
-                            streamWriter.Write(texto);
-                        }
-
-                        array = memoryStream.ToArray();
-                    }
-                }
+                var bytes = Encoding.UTF8.GetBytes(texto);
+                var hash = sha.ComputeHash(bytes);
+                return Convert.ToBase64String(hash);
             }
-
-            return Convert.ToBase64String(array);
         }
+
 
         #endregion
     }

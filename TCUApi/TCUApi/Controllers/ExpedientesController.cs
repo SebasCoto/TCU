@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using MySql.Data.MySqlClient;
+using MySqlConnector;
 using System.Data;
 using System.Security.Cryptography;
 using System.Text;

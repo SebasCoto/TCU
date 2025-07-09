@@ -9,6 +9,6 @@ namespace TCUApi.Servicios
         bool EsAdministrador(IEnumerable<Claim> claims);
 
         void EnviarCorreo(string destino, string asunto, string contenido);
-        string Encrypt(string texto);
+        string HashSHA256(string texto);
     }
 }

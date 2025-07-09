@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
@@ -14,17 +14,21 @@ builder.Services.AddCors(options =>
         {
             policy.WithOrigins(
             "http://localhost:7216",
-            "https://spiffy-bienenstitch-2a115a.netlify.app"
+            "https://spiffy-bienenstitch-2a115a.netlify.app",
+            "https://abrazosparatodos-8d88e.web.app"
         )
 
                   .AllowAnyHeader()
-                  .AllowAnyMethod();
+.AllowAnyMethod()
+.AllowCredentials();
         });
 });
 
 
 
-
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole(); 
+builder.Logging.SetMinimumLevel(LogLevel.Information);
 
 // Add services to the container.
 
@@ -32,6 +36,8 @@ builder.Services.AddControllers().AddJsonOptions(x => x.JsonSerializerOptions.Pr
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddHttpClient();
+builder.Configuration.AddEnvironmentVariables();
+var connectionString = builder.Configuration.GetSection("ConnectionStrings:AbrazosDBConnection").Value;
 
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IGeneral, General>();
@@ -87,9 +93,11 @@ if (app.Environment.IsDevelopment())
 
 
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.UseCors("MyPolicy");
+app.UseAuthentication();
+
 app.UseAuthorization();
 app.MapControllers();
 

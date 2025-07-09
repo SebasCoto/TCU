@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Data;
 using TCUApi.Model;
 using TCUApi.Servicios;
-using MySql.Data.MySqlClient;
+using MySqlConnector;
 
 namespace TCUApi.Controllers
 {

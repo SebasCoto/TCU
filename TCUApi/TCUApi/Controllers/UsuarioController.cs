@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using MySql.Data.MySqlClient;
+using MySqlConnector;
 using System.Data;
 using System.Security.Cryptography;
 using System.Text;
@@ -190,9 +190,9 @@ namespace TCUApi.Controllers
                     return BadRequest(new { Indicador = false, Mensaje = "La contraseña nueva no coincide con la confirmación" });
                 }
 
-                string encryptedPassword = _general.Encrypt(model.Password!);
-                string encryptedPasswordConfirm = _general.Encrypt(model.ConfirmPassword!);
-                string encryptedPasswordOld = _general.Encrypt(model.OldPassword!);
+                string encryptedPassword = _general.HashSHA256(model.Password!);
+                string encryptedPasswordConfirm = _general.HashSHA256(model.ConfirmPassword!);
+                string encryptedPasswordOld = _general.HashSHA256(model.OldPassword!);
                 long idUsuario = _general.ObtenerUsuarioFromToken(User.Claims);
 
                 using (var connection = new MySqlConnection(_configuration.GetConnectionString("AbrazosDBConnection")))

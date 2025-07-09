@@ -86,7 +86,6 @@ export default {
     watch(
       () => props.eventoSeleccionado,
       (nuevoValor) => {
-        console.log('Nuevo valor recibido:', nuevoValor)
         evento.value = {
           ...nuevoValor,
         }

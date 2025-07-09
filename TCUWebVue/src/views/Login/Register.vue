@@ -36,7 +36,7 @@ const consultarCedula = async () => {
       if (data && data.results && data.results.length > 0) {
         const result = data.results[0]
 
-        usuario.value.NombreUsuario = result.firstname || result.firstname
+        usuario.value.NombreUsuario = result.lastname || result.lastname
         usuario.value.Apellidos = `${result.lastname1} ${result.lastname2}`
       } else {
         errorMsg.value = 'No se encontraron datos para esta cédula'

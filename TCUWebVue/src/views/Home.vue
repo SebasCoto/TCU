@@ -5,6 +5,7 @@ import {
   modalEditarVisible,
   modalDetalleVisible,
   eventoSeleccionado,
+  fechaSeleccionada,
   calendarOptions,
   refrescarEventos,
 } from '@/assets/Js/home'
@@ -26,6 +27,7 @@ onMounted(async () => {
     <!-- Modal de creación de evento -->
     <CrearEventoModal
       :modalVisible="modalCrearVisible"
+      :fechaSeleccionada="fechaSeleccionada"
       @cerrar="modalCrearVisible = false"
       @evento-actualizado="refrescarEventos"
     />
